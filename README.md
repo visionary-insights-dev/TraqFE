@@ -3,29 +3,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Run the dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
-
-## Scripts
-
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start dev server |
-| `npm run build` | Production build |
-| `npm run lint` | ESLint |
-| `npm run type-check` | TypeScript check |
-| `npm run test` | Jest tests |
-| `npm run test:e2e` | Playwright E2E |
-
-## AI Config
-
-Project AI config (AGENTS.md, CLAUDE.md, PROGRESS.md, opencode.json, `.opencode/`, `.claude/`) is shared via `traq-ai-setup.zip` at the repo root. Unzip it into the project root to restore your local AI setup.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for full setup instructions, AI tooling, and quality gates.
 
 ## Learn More
 
