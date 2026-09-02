@@ -154,3 +154,106 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Premium surface helpers (Phase 3 scholar polish) ---- */
+/* Defined unlayered so they reliably override the base Card/utility
+   surfaces while keeping the frosted, premium look. */
+
+/* Soft ambient gradient wash for the scholar shell */
+.scholar-shell {
+  background-color: var(--color-neutral-50);
+  background-image:
+    radial-gradient(
+      60rem 40rem at 115% -10%,
+      var(--color-brand-100),
+      transparent 60%
+    ),
+    radial-gradient(
+      50rem 34rem at -15% 110%,
+      var(--color-secondary-100),
+      transparent 55%
+    );
+  background-attachment: fixed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scholar-shell {
+    background-attachment: scroll;
+  }
+}
+
+/* Frosted glass surface: translucent fill + blur + hairline ring */
+.glass-surface {
+  background-color: rgb(255 255 255 / 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgb(255 255 255 / 0.6);
+}
+
+.glass-card {
+  background-color: rgb(255 255 255 / 0.78);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgb(229 231 235 / 0.7);
+  box-shadow:
+    0 1px 2px rgb(17 24 39 / 0.04),
+    0 8px 24px -8px rgb(17 24 39 / 0.12);
+}
+
+/* Brand glow for gradient metric cards */
+.brand-glow {
+  box-shadow:
+    0 1px 2px rgb(29 108 245 / 0.18),
+    0 12px 32px -12px rgb(29 108 245 / 0.45);
+}
+
+/* Animated shimmer used by loading skeletons */
+.skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--color-neutral-200);
+}
+.skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.55),
+    transparent
+  );
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+
+/* Gentle entrance for chat thread / list panes */
+.pane-enter {
+  animation: pane-enter 260ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after {
+    animation: none;
+  }
+  .pane-enter {
+    animation: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pane-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
