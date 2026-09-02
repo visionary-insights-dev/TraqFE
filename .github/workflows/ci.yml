@@ -47,7 +47,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: next-build
-          path: .next/
       - run: npx playwright install --with-deps chromium
       - name: Run E2E
         run: npm run test:e2e
