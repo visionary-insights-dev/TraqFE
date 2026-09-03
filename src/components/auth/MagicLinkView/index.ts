@@ -1,0 +1,1 @@
+export { MagicLinkView } from "./MagicLinkView";

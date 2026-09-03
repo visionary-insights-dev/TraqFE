@@ -1,3 +1,5 @@
+import { type UserRole } from "@/stores/types";
+
 export const ASSIGNMENT_STATUSES = [
   "NOT_STARTED",
   "IN_PROGRESS",
@@ -264,4 +266,43 @@ export interface MentorProfile {
   title?: string;
   role: "MENTOR";
   notificationPreferences: NotificationPreferences;
+}
+
+/* ---- Auth types ---- */
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+  rememberMe?: boolean;
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  organizationId: string;
+  avatarUrl?: string;
+  profileComplete: boolean;
+}
+
+export interface LoginResponse {
+  accessToken: string;
+  user: AuthUser;
+}
+
+export interface OnboardingInput {
+  name: string;
+  phone?: string;
+  avatarUrl?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  avatarUrl?: string;
+  role: UserRole;
+  profileComplete: boolean;
 }

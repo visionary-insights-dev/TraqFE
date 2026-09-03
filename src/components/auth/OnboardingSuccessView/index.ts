@@ -1,0 +1,1 @@
+export { OnboardingSuccessView } from "./OnboardingSuccessView";
