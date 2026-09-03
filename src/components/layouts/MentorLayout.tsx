@@ -1,21 +1,29 @@
 "use client";
 
-import { LayoutDashboard, Users, ListChecks, BookOpen, CalendarCheck, Settings } from "lucide-react";
+import { Users, ListChecks, Inbox, CalendarCheck, BookOpen, Settings } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/components/shared/Sidebar/types";
 import type { MentorLayoutProps } from "./types";
 
-const nav: NavItem[] = [
-  { label: "Dashboard", href: "/mentor/dashboard", icon: LayoutDashboard },
+const NAV: Array<Pick<NavItem, "label" | "href" | "icon">> = [
   { label: "My Scholars", href: "/mentor/scholars", icon: Users },
   { label: "Assignments", href: "/mentor/assignments", icon: ListChecks },
-  { label: "Resources", href: "/mentor/resources", icon: BookOpen },
+  { label: "Verification", href: "/mentor/verification", icon: Inbox },
   { label: "Attendance", href: "/mentor/attendance", icon: CalendarCheck },
+  { label: "Resources", href: "/mentor/resources", icon: BookOpen },
   { label: "Settings", href: "/mentor/profile", icon: Settings },
 ];
 
 export const MentorLayout = ({ children }: MentorLayoutProps) => {
+  const pathname = usePathname() ?? "";
+
+  const nav: NavItem[] = NAV.map((item) => ({
+    ...item,
+    active: pathname === item.href || pathname.startsWith(`${item.href}/`),
+  }));
+
   return (
     <div className="mx-auto flex min-h-screen max-w-[1280px] bg-neutral-50">
       <Sidebar items={nav} brand={<Brand />} aria-label="Mentor navigation" />

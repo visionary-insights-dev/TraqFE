@@ -32,7 +32,7 @@ const mobileNav: BottomNavItem[] = [
 
 export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
   return (
-    <div className="min-h-screen bg-neutral-50 lg:flex">
+    <div className="scholar-shell min-h-screen lg:flex">
       <div className="hidden lg:block">
         <Sidebar
           items={desktopNav}
@@ -41,7 +41,7 @@ export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
         />
       </div>
       <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-between border-b border-neutral-200 bg-white px-4 lg:px-8">
+        <header className="glass-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/40 px-4 shadow-sm lg:px-8">
           <div className="lg:hidden">
             <Brand />
           </div>
@@ -61,8 +61,8 @@ export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
 };
 
 const Brand = () => (
-  <span className="flex items-center gap-2 text-lg font-bold text-neutral-900">
-    <span className="flex h-8 w-8 items-center justify-center rounded-md bg-brand-600 text-sm font-bold text-white">
+  <span className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
+    <span className="brand-glow flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-700 text-sm font-bold text-white">
       T
     </span>
     Traq
@@ -70,7 +70,7 @@ const Brand = () => (
 );
 
 const Avatar = () => (
-  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-neutral-200 text-sm font-semibold text-neutral-700">
+  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-brand-200 text-sm font-semibold text-brand-800 ring-1 ring-brand-200">
     ?
   </div>
 );
