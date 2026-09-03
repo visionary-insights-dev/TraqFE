@@ -156,5 +156,112 @@ export interface ProfileUpdateInput {
   name?: string;
   phone?: string;
   avatarUrl?: string;
+  title?: string;
   notificationPreferences?: Partial<NotificationPreferences>;
+}
+
+export interface MentorScholar {
+  id: string;
+  name: string;
+  avatarUrl?: string;
+  email?: string;
+  courseName?: string;
+  progress: {
+    overall: number;
+    assignmentPct: number;
+    attendancePct: number;
+  };
+  atRisk: boolean;
+}
+
+export type AssignmentEditWindow = {
+  minutes: number;
+  publishedAt?: string;
+  published: boolean;
+};
+
+export interface MentorAssignment extends Assignment {
+  published: boolean;
+  publishedAt?: string;
+  audience?: string;
+  courseId?: string;
+  submissionCount?: number;
+  submissionTotal?: number;
+}
+
+export interface ChangeRequestInput {
+  assignmentId: string;
+  message: string;
+}
+
+export interface VerificationItem {
+  id: string;
+  assignmentId: string;
+  assignmentTitle: string;
+  scholarId: string;
+  scholarName: string;
+  courseName?: string;
+  submittedAt: string;
+  submissionUrl?: string;
+  status: AssignmentStatus;
+  late: boolean;
+}
+
+export interface VerificationActionInput {
+  submissionId: string;
+  comment?: string;
+}
+
+export interface Meeting {
+  id: string;
+  title: string;
+  startsAt: string;
+  endsAt?: string;
+  courseName?: string;
+}
+
+export interface MeetingInput {
+  title: string;
+  startsAt: string;
+  courseId?: string;
+}
+
+export interface AttendanceRecord {
+  meetingId: string;
+  scholarId: string;
+  name: string;
+  attendance: AttendanceStatus;
+}
+
+export interface AttendanceRosterInput {
+  meetingId: string;
+  records: Array<{
+    scholarId: string;
+    attendance: AttendanceStatus;
+  }>;
+}
+
+export interface ResourceUploadUrl {
+  uploadUrl: string;
+  fileKey: string;
+  publicUrl?: string;
+}
+
+export interface ResourceUploadInput {
+  name: string;
+  type: ResourceType;
+  courseId?: string;
+  url?: string;
+  fileKey?: string;
+}
+
+export interface MentorProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  avatarUrl?: string;
+  title?: string;
+  role: "MENTOR";
+  notificationPreferences: NotificationPreferences;
 }

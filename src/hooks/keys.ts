@@ -8,4 +8,11 @@ export const queryKeys = {
   messages: (conversationId: string) =>
     ["chats", "messages", conversationId] as const,
   profile: ["profile"] as const,
+  mentorScholars: ["mentor", "scholars"] as const,
+  mentorScholar: (id: string) => ["mentor", "scholars", id] as const,
+  mentorAssignments: ["mentor", "assignments"] as const,
+  verificationQueue: ["mentor", "verification"] as const,
+  meetings: ["mentor", "meetings"] as const,
+  mentorCourses: ["mentor", "courses"] as const,
+  mentorProfile: ["mentor", "profile"] as const,
 };
