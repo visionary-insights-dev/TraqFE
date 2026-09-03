@@ -9,6 +9,7 @@ interface RefreshTokenPayload {
   organizationId?: string;
   email?: string;
   name?: string;
+  profileComplete?: boolean;
 }
 
 const ROLE_HOME: Record<UserRole, string> = {
@@ -103,12 +104,31 @@ export async function middleware(
       url.search = "";
       return NextResponse.redirect(url);
     }
+    // Force incomplete profiles to complete onboarding before accessing
+    // protected role pages.
+    if (payload.profileComplete === false) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/onboarding";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
     return NextResponse.next();
   }
 
   if (config.redirectAuthed && isAuthenticated && payload?.role) {
+    // Don't bounce already-authenticated users off onboarding/success if
+    // their profile isn't complete yet.
+    const isOnboardingRoute =
+      pathname === "/auth/onboarding" ||
+      pathname === "/auth/onboarding/success";
+    if (payload.profileComplete === false && !isOnboardingRoute) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/onboarding";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
     const home = ROLE_HOME[payload.role];
-    if (home) {
+    if (home && payload.profileComplete !== false) {
       const url = request.nextUrl.clone();
       url.pathname = home;
       url.search = "";

@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  checks:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -27,28 +27,8 @@ jobs:
         run: npm test
       - name: Build
         run: npm run build
-      - uses: actions/upload-artifact@v4
-        with:
-          name: next-build
-          path: .next/
-          retention-days: 1
-
-  e2e:
-    needs: checks
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - name: Restore build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: next-build
-          path: .next/
-      - run: npx playwright install --with-deps chromium
+      - name: Install Playwright dependencies
+        run: npx playwright install --with-deps chromium
       - name: Run E2E
         run: npm run test:e2e
       - uses: actions/upload-artifact@v4

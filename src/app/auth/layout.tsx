@@ -1,8 +1,9 @@
-import { AuthLayout } from "@/components/layouts";
 import type { Metadata } from "next";
+import { AuthLayout } from "@/components/layouts";
+import { AuthBrandPanel } from "@/components/auth";
 
 export const metadata: Metadata = {
-  title: "Authentication",
+  title: "Auth",
 };
 
 export default function AuthLayoutGroup({
@@ -10,5 +11,9 @@ export default function AuthLayoutGroup({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthLayout>{children}</AuthLayout>;
+  return (
+    <AuthLayout visual={<AuthBrandPanel />}>
+      {children}
+    </AuthLayout>
+  );
 }
