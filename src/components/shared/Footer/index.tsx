@@ -17,7 +17,7 @@ export const Footer = ({
   return (
     <footer
       className={cn(
-        "border-t border-neutral-200 bg-neutral-0 py-8",
+        "border-t border-gray-200 bg-neutral-0 py-6 flex flex-col sm:flex-row items-center justify-between gap-4",
         className
       )}
       {...props}
@@ -32,7 +32,7 @@ export const Footer = ({
               <a
                 key={link.href}
                 href={link.href}
-                className="text-neutral-600 hover:text-neutral-900 transition-colors text-sm"
+                className="flex items-center gap-6 text-sm text-gray-600"
               >
                 {link.label}
               </a>

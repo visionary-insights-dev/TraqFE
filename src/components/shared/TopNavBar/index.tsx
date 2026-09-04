@@ -16,105 +16,35 @@ export const TopNavBar = ({
   ...props
 }: TopNavBarProps) => {
   return (
-    <nav
-      className={cn(
-        "border-b border-neutral-200 bg-neutral-0 sticky top-0 z-10",
-        className
-      )}
+    <header
+      className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4"
       {...props}
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-2">
-            <Link
-              href="/"
-              className="flex items-center gap-2"
-            >
-              <span className="text-xl font-bold tracking-trap">Traq</span>
-            </Link>
-            <button
-              className="lg:hidden p-2"
-              aria-label="Open navigation"
-            >
-              <svg
-                className="h-6 w-6 stroke-current"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-          <div className="hidden lg:block">
-            <div className="flex items-center gap-8">
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-neutral-700 hover:text-brand-600 transition-colors font-medium"
-                >
-                  {link.label}
-                </a>
-              ))}
-              <div className="flex items-center gap-3">
-                <Button
-                  className="px-4 py-1.5 text-sm"
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant="primary"
-                  className="px-4 py-1.5 text-sm"
-                >
-                  Get Started
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile menu, hidden on desktop */}
-        <div className="lg:hidden hidden">
-          <div
-            className="fixed inset-0 bg-neutral-900 top-16 left-0 z-50 flex flex-col h-screen p-6 gap-4"
-            aria-label="Main navigation"
-          >
-            <div className="text-2xl font-bold text-neutral-100 hover:text-neutral-200">
-              Traq
-            </div>
-            <nav>
-              {navLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-neutral-700 hover:text-brand-600 py-2"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-            <div className="mt-6 flex gap-3">
-              <Button
-                variant="primary"
-                className="w-full py-2 text-sm"
-              >
-                Get Started
-              </Button>
-              <Button
-                className="w-full py-2 text-sm"
-              >
-                Sign In
-              </Button>
-            </div>
-          </div>
-        </div>
+      <div className="flex-shrink-0">
+        <Link href="/" className="text-xl font-bold text-[var(--traq-purple)]">
+          TRAQ
+        </Link>
       </div>
-    </nav>
+
+      <nav className="hidden md:flex items-center gap-6 px-6 py-2 bg-gray-50/80 rounded-full border border-gray-100">
+        <a href="#hero" className="text-sm font-medium text-gray-600 hover:text-gray-900">Home</a>
+        <a href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900">Features</a>
+        <a href="#roles" className="text-sm font-medium text-gray-600 hover:text-gray-900">Roles</a>
+        <a href="#cta" className="text-sm font-medium text-gray-600 hover:text-gray-900">CTA</a>
+      </nav>
+
+      <div className="flex items-center gap-3 flex-shrink-0">
+        <Link href="/auth/sign-in">
+          <Button variant="outline" size="sm" className="whitespace-nowrap px-4 border border-[var(--traq-purple)] bg-white/80 text-[var(--traq-purple)]">
+            Sign In
+          </Button>
+        </Link>
+        <Link href="/auth/sign-in">
+          <Button size="sm" className="whitespace-nowrap px-4 bg-[var(--traq-purple)] text-white hover:bg-[var(--traq-purple-hover)]">
+            Get Started
+          </Button>
+        </Link>
+      </div>
+    </header>
   );
 };
