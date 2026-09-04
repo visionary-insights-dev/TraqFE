@@ -143,7 +143,7 @@ export default function LandingPage() {
         <h2
           className="text-3xl font-bold tracking-tight text-[--accent-primary] text-center lg:text-4xl mb-6"
         >
-          Program management shouldn't feel fragmented.
+          Program management shouldn&apos;t feel fragmented.
         </h2>
         <p
           className="text-[--color-secondary] text-lg lg:text-base text-center lg:w-2/3 mx-auto mb-10"
