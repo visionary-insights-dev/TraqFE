@@ -103,4 +103,36 @@ describe("middleware role guards", () => {
     const response = await middleware(makeRequest("/"));
     expect(response).toMatchObject({ kind: "next" });
   });
+
+  // A user whose profile is incomplete is forced to onboarding even when
+  // trying to reach a protected role page.
+  it("forces an incomplete-profile user to onboarding on a protected route", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
+    const response = await middleware(makeRequest("/scholar/dashboard", "token"), verify);
+    expect(response).toMatchObject({ kind: "redirect" });
+    expect(redirectPath(response)).toBe("/auth/onboarding");
+  });
+
+  // An incomplete-profile user sitting on the onboarding screen is not
+  // bounced away (so they can complete it).
+  it("does not redirect an incomplete-profile user away from onboarding", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
+    const response = await middleware(makeRequest("/auth/onboarding", "token"), verify);
+    expect(response).toMatchObject({ kind: "next" });
+  });
+
+  // A complete-profile user is redirected from the auth area to their role
+  // home as before (profileComplete true).
+  it("redirects a complete-profile authenticated scholar away from /auth", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: true });
+    const response = await middleware(makeRequest("/auth/sign-in", "token"), verify);
+    expect(response).toMatchObject({ kind: "redirect" });
+    expect(redirectPath(response)).toBe("/scholar/dashboard");
+  });
 });

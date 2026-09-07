@@ -2,6 +2,10 @@
 import { render, screen } from "@/test-utils";
 import { MentorLayout } from "./index";
 
+jest.mock("next/navigation", () => ({
+  usePathname: jest.fn(() => "/mentor/scholars"),
+}));
+
 describe("MentorLayout", () => {
   it("renders mentor navigation items", () => {
     render(
@@ -18,9 +22,21 @@ describe("MentorLayout", () => {
       "href",
       "/mentor/assignments"
     );
+    expect(screen.getByRole("link", { name: "Verification" })).toHaveAttribute(
+      "href",
+      "/mentor/verification"
+    );
     expect(screen.getByRole("link", { name: "Attendance" })).toHaveAttribute(
       "href",
       "/mentor/attendance"
+    );
+    expect(screen.getByRole("link", { name: "Resources" })).toHaveAttribute(
+      "href",
+      "/mentor/resources"
+    );
+    expect(screen.getByRole("link", { name: "Settings" })).toHaveAttribute(
+      "href",
+      "/mentor/profile"
     );
   });
 

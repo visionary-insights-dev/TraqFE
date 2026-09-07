@@ -9,4 +9,5 @@ export interface User {
   role: UserRole;
   organizationId: string;
   avatarUrl?: string;
+  profileComplete?: boolean;
 }
