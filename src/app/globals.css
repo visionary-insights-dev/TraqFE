@@ -49,6 +49,25 @@
   --color-info-light: #e0f2fe;
   --color-info-dark: #0369a1;
 
+  /* --- Canonical brand palette --- */
+  --traq-purple: #4B31D1;
+  --traq-purple-hover: #3923A9;
+  --traq-purple-soft: #F3F0FF;
+  --traq-ink: #17151F;
+  --traq-muted: #666274;
+  --role-mentor-teal: #0F9496;
+  --role-scholar-amber: #F59E0B;
+
+/* Glassmorphism surfaces */
+  --surface-elevated: rgba(255,255,255,0.68);
+  --surface-lavender: #F3F0FF;
+
+  /* Accent palette */
+  --accent-primary: #4B31D1;
+  --accent-hover: #3923A9;
+  --accent-secondary: #0F9496; /* Teal for Mentor */
+  --accent-tertiary: #F59E0B;   /* Amber for Scholar */
+
   /* Neutral scale */
   --color-neutral-0: #ffffff;
   --color-neutral-50: #f9fafb;
@@ -152,5 +171,92 @@ body {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+  /* Disable motion-specific classes */
+  .motion-reduce > * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Reduced motion: suppress generous or distracting transforms */
+@media (prefers-reduced-motion: reduce) {
+  .no-reduce-on-reduce {
+    animation: none !important;
+    transition: none !important;
+  }
+  .reduce-scale-on-hover:hover {
+    transform: none !important;
+  }
+  .reduce-underline-on-hover:hover::after {
+    width: 0 !important;
+  }
+}
+
+/* Button hover transition */
+.btn-hover {
+  transition: color 150ms var(--ease-standard), background-color 150ms var(--ease-standard),
+    box-shadow 150ms var(--ease-standard), transform 150ms var(--ease-standard) 150ms;
+  transition-property: color, background-color, box-shadow, transform;
+}
+
+.btn-press {
+  transition: transform 100ms var(--ease-standard);
+}
+
+/* Nav link underline animation */
+.nav-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--traq-purple);
+  transition: width 150ms var(--ease-standard);
+}
+
+.nav-underline:hover::after {
+  width: 100%;
+}
+
+/* Glass card hover transition */
+.card-hover {
+  transition: transform 150ms var(--ease-standard), border-color 150ms var(--ease-standard),
+    box-shadow 150ms var(--ease-standard);
+}
+
+/* Scroll reveal classes */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 600ms var(--ease-standard), transform 600ms var(--ease-standard);
+}
+
+.reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stagger-1 { transition-delay: 40ms !important; }
+.stagger-2 { transition-delay: 80ms !important; }
+.stagger-3 { transition-delay: 120ms !important; }
+.stagger-4 { transition-delay: 160ms !important; }
+.stagger-5 { transition-delay: 200ms !important; }
+
+/* Reduced motion: instant reveals */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .stagger-1, .stagger-2, .stagger-3, .stagger-4, .stagger-5 {
+    transition-delay: 0s !important;
   }
 }
