@@ -1,5 +1,5 @@
 // src/middleware.test.ts
-import { middleware } from "./middleware";
+import { middleware, routeRequest } from "./middleware";
 
 // Middleware is the security boundary for role-based routing. It reads the
 // HTTP-only refresh_token cookie (the access token lives in client memory and
@@ -27,7 +27,7 @@ function makeRequest(pathname: string, cookie?: string) {
       get: (name: string) =>
         name === "refresh_token" && cookie ? { value: cookie } : undefined,
     },
-  } as unknown as Parameters<typeof middleware>[0];
+  } as unknown as Parameters<typeof routeRequest>[0];
 }
 
 // The mocked NextResponse.redirect stores the target as a URL object; extract
@@ -38,10 +38,21 @@ function redirectPath(response: unknown): string {
 }
 
 describe("middleware role guards", () => {
+  // Next.js calls middleware as `middleware(request, event)`; the exported
+  // entry point must not crash when the second argument is a fetch event
+  // (which previously landed on the verifier parameter).
+  it("handles the Next.js (request, event) invocation shape", async () => {
+    const response = await middleware(makeRequest("/admin/dashboard"), {
+      waitUntil: () => undefined,
+    });
+    expect(response).toMatchObject({ kind: "redirect" });
+    expect(redirectPath(response)).toBe("/auth/sign-in");
+  });
+
   // No token on a protected route must bounce the user to sign-in.
   it("redirects to sign-in when there is no refresh token on a protected route", async () => {
     const verify = jest.fn();
-    const response = await middleware(makeRequest("/admin/dashboard"), verify);
+    const response = await routeRequest(makeRequest("/admin/dashboard"), verify);
     expect(verify).not.toHaveBeenCalled();
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/auth/sign-in");
@@ -51,7 +62,7 @@ describe("middleware role guards", () => {
   // unauthenticated and bounced to sign-in rather than admitted.
   it("redirects to sign-in when the refresh token fails to verify", async () => {
     const verify = jest.fn().mockResolvedValue(null);
-    const response = await middleware(makeRequest("/scholar/dashboard", "bad-token"), verify);
+    const response = await routeRequest(makeRequest("/scholar/dashboard", "bad-token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/auth/sign-in");
   });
@@ -59,7 +70,7 @@ describe("middleware role guards", () => {
   // A valid SUPER_ADMIN token must be allowed through on /admin.
   it("allows a super admin through the admin area", async () => {
     const verify = jest.fn().mockResolvedValue({ role: "SUPER_ADMIN" });
-    const response = await middleware(makeRequest("/admin/dashboard", "token"), verify);
+    const response = await routeRequest(makeRequest("/admin/dashboard", "token"), verify);
     expect(verify).toHaveBeenCalledWith("token");
     expect(response).toMatchObject({ kind: "next" });
   });
@@ -68,7 +79,7 @@ describe("middleware role guards", () => {
   // they are redirected to their own dashboard.
   it("redirects a scholar away from the admin area (role mismatch)", async () => {
     const verify = jest.fn().mockResolvedValue({ role: "SCHOLAR" });
-    const response = await middleware(makeRequest("/admin/dashboard", "token"), verify);
+    const response = await routeRequest(makeRequest("/admin/dashboard", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
@@ -76,7 +87,7 @@ describe("middleware role guards", () => {
   // A MENTOR is admitted to the mentor area.
   it("allows a mentor into the mentor area", async () => {
     const verify = jest.fn().mockResolvedValue({ role: "MENTOR" });
-    const response = await middleware(makeRequest("/mentor/scholars", "token"), verify);
+    const response = await routeRequest(makeRequest("/mentor/scholars", "token"), verify);
     expect(response).toMatchObject({ kind: "next" });
   });
 
@@ -84,7 +95,7 @@ describe("middleware role guards", () => {
   // bounced to their role home.
   it("redirects an authenticated scholar away from /auth to their role home", async () => {
     const verify = jest.fn().mockResolvedValue({ role: "SCHOLAR" });
-    const response = await middleware(makeRequest("/auth/sign-in", "token"), verify);
+    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
@@ -93,14 +104,14 @@ describe("middleware role guards", () => {
   // protected routes rather than being silently allowed through.
   it("redirects to the landing page when the token payload is missing a role", async () => {
     const verify = jest.fn().mockResolvedValue({});
-    const response = await middleware(makeRequest("/scholar/dashboard", "token"), verify);
+    const response = await routeRequest(makeRequest("/scholar/dashboard", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/");
   });
 
   // Public routes are reachable without a token.
   it("allows public routes through without a token", async () => {
-    const response = await middleware(makeRequest("/"));
+    const response = await routeRequest(makeRequest("/"), jest.fn());
     expect(response).toMatchObject({ kind: "next" });
   });
 
@@ -110,7 +121,7 @@ describe("middleware role guards", () => {
     const verify = jest
       .fn()
       .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await middleware(makeRequest("/scholar/dashboard", "token"), verify);
+    const response = await routeRequest(makeRequest("/scholar/dashboard", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/auth/onboarding");
   });
@@ -121,7 +132,7 @@ describe("middleware role guards", () => {
     const verify = jest
       .fn()
       .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await middleware(makeRequest("/auth/onboarding", "token"), verify);
+    const response = await routeRequest(makeRequest("/auth/onboarding", "token"), verify);
     expect(response).toMatchObject({ kind: "next" });
   });
 
@@ -131,7 +142,7 @@ describe("middleware role guards", () => {
     const verify = jest
       .fn()
       .mockResolvedValue({ role: "SCHOLAR", profileComplete: true });
-    const response = await middleware(makeRequest("/auth/sign-in", "token"), verify);
+    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });

@@ -69,9 +69,22 @@ export type VerifyRefreshToken = (
   token: string
 ) => Promise<RefreshTokenPayload | null>;
 
+// Next.js invokes middleware as `middleware(request, event)`. The event
+// (second arg) would override a verifier parameter, so the injectable logic
+// lives in `routeRequest` and the edge entry point only forwards the request.
 export async function middleware(
   request: NextRequest,
-  verify: VerifyRefreshToken = verifyRefreshToken
+  // @typescript-eslint/no-unused-vars -- kept to document the Next.js
+  // invocation shape (request, event); the verifier lives on routeRequest.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _event?: unknown
+) {
+  return routeRequest(request, verifyRefreshToken);
+}
+
+export async function routeRequest(
+  request: NextRequest,
+  verify: VerifyRefreshToken
 ) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
