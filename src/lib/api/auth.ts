@@ -31,7 +31,14 @@ export function resetPassword(
   token: string,
   password: string
 ): Promise<void> {
-  return post<void>("/auth/reset-password", { token, password });
+  return post<void>("/auth/reset-password", {
+    resetToken: token,
+    newPassword: password,
+  });
+}
+
+export function logout(): Promise<void> {
+  return post<void>("/auth/logout");
 }
 
 export function updateMyProfile(
@@ -44,7 +51,7 @@ export function getProfileUploadUrl(
   filename: string,
   contentType: string
 ): Promise<ResourceUploadUrl> {
-  return post<ResourceUploadUrl>("/uploads/presigned-url", {
+  return post<ResourceUploadUrl>("/resources/upload-url", {
     filename,
     contentType,
   });

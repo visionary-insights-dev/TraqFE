@@ -9,11 +9,11 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: pushMock })),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useMagicLink: jest.fn(),
 }));
 
-import { useMagicLink } from "@/hooks/useAuthMutations";
+import { useMagicLink } from "@/hooks/auth";
 import { MagicLinkView } from "./MagicLinkView";
 
 const mockUseMagicLink = useMagicLink as jest.MockedFunction<typeof useMagicLink>;

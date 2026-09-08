@@ -37,8 +37,8 @@ const mockAnalytics: DashboardAnalytics = {
   mentor: { id: "u1", name: "Amina Bello", title: "Senior Engineer" },
 };
 
-jest.mock("@/hooks/useDashboardAnalytics", () => ({
-  useDashboardAnalytics: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarDashboard: jest.fn(),
 }));
 
 jest.mock("@/hooks/useSocketEvents", () => ({
@@ -50,11 +50,11 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { DashboardView } from "./DashboardView";
-import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
+import { useScholarDashboard } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
-const mockUseDashboardAnalytics = useDashboardAnalytics as jest.MockedFunction<
-  typeof useDashboardAnalytics
+const mockUseScholarDashboard = useScholarDashboard as jest.MockedFunction<
+  typeof useScholarDashboard
 >;
 
 function queryResult(
@@ -99,7 +99,7 @@ describe("DashboardView", () => {
   });
 
   it("shows skeleton while loading", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({ isLoading: true, isPending: true, data: undefined })
     );
 
@@ -111,7 +111,7 @@ describe("DashboardView", () => {
 
   it("shows error state with retry button", async () => {
     const refetch = jest.fn();
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({
         error: new Error("Network error"),
         isError: true,
@@ -135,7 +135,7 @@ describe("DashboardView", () => {
   });
 
   it("shows empty state when data is null", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({ data: null as unknown as DashboardAnalytics })
     );
 
@@ -145,7 +145,7 @@ describe("DashboardView", () => {
   });
 
   it("renders dashboard cards with analytics data", () => {
-    mockUseDashboardAnalytics.mockReturnValue(queryResult({ data: mockAnalytics }));
+    mockUseScholarDashboard.mockReturnValue(queryResult({ data: mockAnalytics }));
 
     renderDashboard();
 
@@ -159,7 +159,7 @@ describe("DashboardView", () => {
   });
 
   it("shows attendance warning when below target", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({
         data: { ...mockAnalytics, attendance: { rate: 65, target: 80 } },
       })
@@ -176,7 +176,7 @@ describe("DashboardView", () => {
 
   it("shows offline banner when disconnected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(false);
-    mockUseDashboardAnalytics.mockReturnValue(queryResult({ data: mockAnalytics }));
+    mockUseScholarDashboard.mockReturnValue(queryResult({ data: mockAnalytics }));
 
     renderDashboard();
 
@@ -187,7 +187,7 @@ describe("DashboardView", () => {
 
   it("does not show offline banner when connected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(true);
-    mockUseDashboardAnalytics.mockReturnValue(queryResult({ data: mockAnalytics }));
+    mockUseScholarDashboard.mockReturnValue(queryResult({ data: mockAnalytics }));
 
     renderDashboard();
 
@@ -195,7 +195,7 @@ describe("DashboardView", () => {
   });
 
   it("hides upcoming meeting card when no meeting scheduled", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({ data: { ...mockAnalytics, upcomingMeeting: null } })
     );
 
@@ -205,7 +205,7 @@ describe("DashboardView", () => {
   });
 
   it("hides mentor card when no mentor assigned", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({ data: { ...mockAnalytics, mentor: null } })
     );
 
@@ -215,7 +215,7 @@ describe("DashboardView", () => {
   });
 
   it("shows empty active tasks message when no tasks", () => {
-    mockUseDashboardAnalytics.mockReturnValue(
+    mockUseScholarDashboard.mockReturnValue(
       queryResult({ data: { ...mockAnalytics, activeTasks: [] } })
     );
 

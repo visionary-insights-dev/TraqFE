@@ -2,13 +2,13 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { MentorProfile } from "@/lib/types";
 
-jest.mock("@/hooks/useMentorProfile", () => ({
+jest.mock("@/hooks/mentor", () => ({
   useMentorProfile: jest.fn(),
   useUpdateMentorProfile: jest.fn(),
 }));
 
 const { useMentorProfile, useUpdateMentorProfile } =
-  jest.requireMock("@/hooks/useMentorProfile");
+  jest.requireMock("@/hooks/mentor");
 
 jest.mock("@/hooks/useConnectivity", () => ({
   useConnectivity: jest.fn(() => true),

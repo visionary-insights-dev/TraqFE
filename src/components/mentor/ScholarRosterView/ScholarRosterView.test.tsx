@@ -2,7 +2,7 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { MentorScholar } from "@/lib/types";
 
-jest.mock("@/hooks/useMentorScholars", () => ({
+jest.mock("@/hooks/mentor", () => ({
   useMentorScholars: jest.fn(),
 }));
 
@@ -14,7 +14,7 @@ jest.mock("@/hooks/useSocketEvents", () => ({
   useSocketEvents: jest.fn(),
 }));
 
-const { useMentorScholars } = jest.requireMock("@/hooks/useMentorScholars");
+const { useMentorScholars } = jest.requireMock("@/hooks/mentor");
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
 const sampleScholars: MentorScholar[] = [

@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { FolderOpen, WifiOff } from "lucide-react";
-import { useResources, useConnectivity } from "@/hooks";
+import { useScholarResources, useConnectivity } from "@/hooks";
 import { EmptyState, ErrorState } from "@/components/ui";
 import { ResourceCard } from "./ResourceCard";
 import { ResourceFilters, type ResourceTypeFilter } from "./ResourceFilters";
 
 export const ResourcesView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useResources();
+  const { data, isLoading, isError, refetch } = useScholarResources();
   const [search, setSearch] = useState("");
   const [type, setType] = useState<ResourceTypeFilter>("ALL");
 

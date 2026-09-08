@@ -11,12 +11,12 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: pushMock })),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useVerifyOtp: jest.fn(),
   useForgotPassword: jest.fn(),
 }));
 
-import { useVerifyOtp, useForgotPassword } from "@/hooks/useAuthMutations";
+import { useVerifyOtp, useForgotPassword } from "@/hooks/auth";
 import { OtpVerificationView } from "./OtpVerificationView";
 
 type VerifyOtpResult = UseMutationResult<

@@ -1,5 +1,5 @@
 // src/components/layouts/MentorLayout.test.tsx
-import { render, screen } from "@/test-utils";
+import { renderWithProviders, screen } from "@/test-utils";
 import { MentorLayout } from "./index";
 
 jest.mock("next/navigation", () => ({
@@ -8,7 +8,7 @@ jest.mock("next/navigation", () => ({
 
 describe("MentorLayout", () => {
   it("renders mentor navigation items", () => {
-    render(
+    renderWithProviders(
       <MentorLayout>
         <p>Mentor content</p>
       </MentorLayout>
@@ -42,7 +42,7 @@ describe("MentorLayout", () => {
 
   // Mentors manage scholars, not platform administration.
   it("does not expose admin management routes to a mentor", () => {
-    render(
+    renderWithProviders(
       <MentorLayout>
         <p>Mentor content</p>
       </MentorLayout>
@@ -54,7 +54,7 @@ describe("MentorLayout", () => {
   });
 
   it("renders its children", () => {
-    render(
+    renderWithProviders(
       <MentorLayout>
         <p>Mentor scholar roster</p>
       </MentorLayout>

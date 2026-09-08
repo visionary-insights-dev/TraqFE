@@ -10,7 +10,7 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: pushMock })),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useOnboardingSubmit: jest.fn(),
 }));
 
@@ -19,7 +19,7 @@ jest.mock("@/lib/api/auth", () => ({
   uploadFileDirect: jest.fn(),
 }));
 
-import { useOnboardingSubmit } from "@/hooks/useAuthMutations";
+import { useOnboardingSubmit } from "@/hooks/auth";
 import { OnboardingView } from "./OnboardingView";
 
 const mockUseOnboardingSubmit = useOnboardingSubmit as jest.MockedFunction<typeof useOnboardingSubmit>;

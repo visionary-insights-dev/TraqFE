@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getCohort } from "@/lib/api/scholar";
-import { queryKeys } from "./keys";
+import { queryKeys } from "../keys";
 
-export function useCohort() {
+export function useScholarCohort() {
   return useQuery({
-    queryKey: queryKeys.cohort,
+    queryKey: queryKeys.scholarCohort,
     queryFn: getCohort,
   });
 }

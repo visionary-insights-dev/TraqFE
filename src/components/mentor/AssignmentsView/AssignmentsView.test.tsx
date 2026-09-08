@@ -2,14 +2,11 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { MentorAssignment } from "@/lib/types";
 
-jest.mock("@/hooks/useMentorAssignments", () => ({
+jest.mock("@/hooks/mentor", () => ({
   useMentorAssignments: jest.fn(),
   useCreateAssignment: jest.fn(),
   usePublishAssignment: jest.fn(),
   useRequestChange: jest.fn(),
-}));
-
-jest.mock("@/hooks/useMeetings", () => ({
   useMentorCourses: jest.fn(),
 }));
 
@@ -26,8 +23,8 @@ const {
   useCreateAssignment,
   usePublishAssignment,
   useRequestChange,
-} = jest.requireMock("@/hooks/useMentorAssignments");
-const { useMentorCourses } = jest.requireMock("@/hooks/useMeetings");
+  useMentorCourses,
+} = jest.requireMock("@/hooks/mentor");
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
 const sampleAssignments: MentorAssignment[] = [

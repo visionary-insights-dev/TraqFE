@@ -2,23 +2,14 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { Resource } from "@/lib/types";
 
-jest.mock("@/hooks/useResources", () => ({
-  useResources: jest.fn(),
-}));
-
-const { useResources } = jest.requireMock("@/hooks/useResources");
-
-jest.mock("@/hooks/useMeetings", () => ({
+jest.mock("@/hooks/mentor", () => ({
+  useMentorResources: jest.fn(),
   useMentorCourses: jest.fn(),
-}));
-
-const { useMentorCourses } = jest.requireMock("@/hooks/useMeetings");
-
-jest.mock("@/hooks/useMentorResources", () => ({
   useUploadResource: jest.fn(),
 }));
 
-const { useUploadResource } = jest.requireMock("@/hooks/useMentorResources");
+const { useMentorResources, useMentorCourses, useUploadResource } =
+  jest.requireMock("@/hooks/mentor");
 
 jest.mock("@/hooks/useConnectivity", () => ({
   useConnectivity: jest.fn(() => true),
@@ -98,33 +89,33 @@ beforeEach(() => {
 
 describe("ResourceCenterView", () => {
   it("shows skeleton while loading", () => {
-    useResources.mockReturnValue(queryResult({ isLoading: true, data: undefined }));
+    useMentorResources.mockReturnValue(queryResult({ isLoading: true, data: undefined }));
     render(<ResourceCenterView />);
     expect(screen.getByLabelText("Loading resources")).toBeInTheDocument();
   });
 
   it("shows error state with retry", () => {
     const refetch = jest.fn();
-    useResources.mockReturnValue(queryResult({ isError: true, status: "error", refetch }));
+    useMentorResources.mockReturnValue(queryResult({ isError: true, status: "error", refetch }));
     render(<ResourceCenterView />);
     expect(screen.getByText("Could not load resources")).toBeInTheDocument();
   });
 
   it("shows true-empty state", () => {
-    useResources.mockReturnValue(queryResult({ data: [] }));
+    useMentorResources.mockReturnValue(queryResult({ data: [] }));
     render(<ResourceCenterView />);
     expect(screen.getByText("No resources yet")).toBeInTheDocument();
   });
 
   it("renders resources", () => {
-    useResources.mockReturnValue(queryResult({ data: sampleResources }));
+    useMentorResources.mockReturnValue(queryResult({ data: sampleResources }));
     render(<ResourceCenterView />);
     expect(screen.getByText("Intro to APIs")).toBeInTheDocument();
     expect(screen.getByText("CSS Grid Guide")).toBeInTheDocument();
   });
 
   it("filters resources by type", async () => {
-    useResources.mockReturnValue(queryResult({ data: sampleResources }));
+    useMentorResources.mockReturnValue(queryResult({ data: sampleResources }));
     render(<ResourceCenterView />);
     const user = (await import("@testing-library/user-event")).default;
     await user.click(screen.getByRole("button", { name: "Links" }));
@@ -134,7 +125,7 @@ describe("ResourceCenterView", () => {
 
   it("shows offline banner when disconnected", () => {
     useConnectivity.mockReturnValue(false);
-    useResources.mockReturnValue(queryResult({ data: sampleResources }));
+    useMentorResources.mockReturnValue(queryResult({ data: sampleResources }));
     render(<ResourceCenterView />);
     expect(screen.getByText(/You're offline/)).toBeInTheDocument();
   });

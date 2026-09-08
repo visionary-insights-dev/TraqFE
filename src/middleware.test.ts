@@ -65,12 +65,12 @@ describe("middleware role guards", () => {
   });
 
   // A SCHOLAR trying to reach /admin (role mismatch) is not silently dropped —
-  // they are redirected away to a non-privileged location.
+  // they are redirected to their own dashboard.
   it("redirects a scholar away from the admin area (role mismatch)", async () => {
     const verify = jest.fn().mockResolvedValue({ role: "SCHOLAR" });
     const response = await middleware(makeRequest("/admin/dashboard", "token"), verify);
     expect(response).toMatchObject({ kind: "redirect" });
-    expect(redirectPath(response)).toBe("/");
+    expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
 
   // A MENTOR is admitted to the mentor area.

@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
+import { WebSocketProvider } from "@/components/shared/Providers";
 import type { NavItem } from "@/components/shared/Sidebar/types";
 import type { BottomNavItem } from "@/components/shared/BottomNav/types";
 import type { ScholarLayoutProps } from "./types";
@@ -32,31 +33,33 @@ const mobileNav: BottomNavItem[] = [
 
 export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
   return (
-    <div className="scholar-shell min-h-screen lg:flex">
-      <div className="hidden lg:block">
-        <Sidebar
-          items={desktopNav}
-          brand={<Brand />}
-          aria-label="Scholar navigation"
-        />
+    <WebSocketProvider>
+      <div className="scholar-shell min-h-screen lg:flex">
+        <div className="hidden lg:block">
+          <Sidebar
+            items={desktopNav}
+            brand={<Brand />}
+            aria-label="Scholar navigation"
+          />
+        </div>
+        <div className="flex flex-1 flex-col">
+          <header className="glass-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/40 px-4 shadow-sm lg:px-8">
+            <div className="lg:hidden">
+              <Brand />
+            </div>
+            <div className="ml-auto flex items-center gap-4">
+              <Avatar />
+            </div>
+          </header>
+          <main className="flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8">
+            {children}
+          </main>
+        </div>
+        <div className="lg:hidden">
+          <BottomNav items={mobileNav} />
+        </div>
       </div>
-      <div className="flex flex-1 flex-col">
-        <header className="glass-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/40 px-4 shadow-sm lg:px-8">
-          <div className="lg:hidden">
-            <Brand />
-          </div>
-          <div className="ml-auto flex items-center gap-4">
-            <Avatar />
-          </div>
-        </header>
-        <main className="flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8">
-          {children}
-        </main>
-      </div>
-      <div className="lg:hidden">
-        <BottomNav items={mobileNav} />
-      </div>
-    </div>
+    </WebSocketProvider>
   );
 };
 

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useOnboardingSubmit } from "@/hooks/useAuthMutations";
+import { useOnboardingSubmit } from "@/hooks/auth";
 import {
   onboardingSchema,
   type OnboardingFormInput,

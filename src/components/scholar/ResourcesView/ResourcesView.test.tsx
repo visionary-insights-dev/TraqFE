@@ -28,8 +28,8 @@ const resources: Resource[] = [
   },
 ];
 
-jest.mock("@/hooks/useResources", () => ({
-  useResources: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarResources: jest.fn(),
 }));
 
 jest.mock("@/hooks/useConnectivity", () => ({
@@ -37,11 +37,11 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { ResourcesView } from "./ResourcesView";
-import { useResources } from "@/hooks/useResources";
+import { useScholarResources } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
-const mockUseResources = useResources as jest.MockedFunction<
-  typeof useResources
+const mockUseScholarResources = useScholarResources as jest.MockedFunction<
+  typeof useScholarResources
 >;
 
 function queryResult(
@@ -86,7 +86,7 @@ describe("ResourcesView", () => {
   });
 
   it("shows skeleton while loading", () => {
-    mockUseResources.mockReturnValue(
+    mockUseScholarResources.mockReturnValue(
       queryResult({ isLoading: true, isPending: true, data: undefined })
     );
 
@@ -98,7 +98,7 @@ describe("ResourcesView", () => {
 
   it("shows error state with retry button", () => {
     const refetch = jest.fn();
-    mockUseResources.mockReturnValue(
+    mockUseScholarResources.mockReturnValue(
       queryResult({
         error: new Error("Network error"),
         isError: true,
@@ -116,7 +116,7 @@ describe("ResourcesView", () => {
   });
 
   it("shows empty state when no resources", () => {
-    mockUseResources.mockReturnValue(queryResult({ data: [] }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: [] }));
 
     renderResources();
 
@@ -124,7 +124,7 @@ describe("ResourcesView", () => {
   });
 
   it("renders resource cards", () => {
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 
@@ -134,7 +134,7 @@ describe("ResourcesView", () => {
   });
 
   it("filters by resource type", async () => {
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 
@@ -144,7 +144,7 @@ describe("ResourcesView", () => {
   });
 
   it("filters by search term", async () => {
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 
@@ -155,7 +155,7 @@ describe("ResourcesView", () => {
   });
 
   it("shows no-results empty state with clear filters button", async () => {
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 
@@ -171,7 +171,7 @@ describe("ResourcesView", () => {
 
   it("shows offline banner when disconnected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(false);
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 
@@ -180,7 +180,7 @@ describe("ResourcesView", () => {
 
   it("does not show offline banner when connected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(true);
-    mockUseResources.mockReturnValue(queryResult({ data: resources }));
+    mockUseScholarResources.mockReturnValue(queryResult({ data: resources }));
 
     renderResources();
 

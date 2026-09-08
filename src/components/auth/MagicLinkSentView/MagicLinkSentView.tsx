@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useMagicLink } from "@/hooks/useAuthMutations";
+import { useMagicLink } from "@/hooks/auth";
 import { useCooldown } from "@/hooks/useCooldown";
 import { Button } from "@/components/ui";
 import { AuthCard, AuthErrorBanner } from "@/components/auth";

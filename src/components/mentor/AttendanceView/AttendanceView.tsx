@@ -4,10 +4,10 @@ import { useState } from "react";
 import { CalendarClock, CalendarPlus, UserRoundCheck, WifiOff } from "lucide-react";
 import {
   useCreateMeeting,
-  useMeetings,
+  useMentorMeetings,
   useMentorCourses,
   useMentorScholars,
-  useSaveAttendance,
+  useRecordAttendance,
   useConnectivity,
   useSocketEvents,
 } from "@/hooks";
@@ -20,16 +20,16 @@ import type { Meeting } from "@/lib/types";
 
 export const AttendanceView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useMeetings();
+  const { data, isLoading, isError, refetch } = useMentorMeetings();
   const { data: courses = [] } = useMentorCourses();
   const { data: scholars = [] } = useMentorScholars();
   const createMeetingMutation = useCreateMeeting();
-  const saveAttendanceMutation = useSaveAttendance();
+  const saveAttendanceMutation = useRecordAttendance();
   const [createOpen, setCreateOpen] = useState(false);
   const [rosterMeeting, setRosterMeeting] = useState<Meeting | null>(null);
 
   useSocketEvents(["analytics.course.updated"], {
-    invalidateKeys: [queryKeys.meetings],
+    invalidateKeys: [queryKeys.mentorMeetings],
   });
 
   const handleCreate = async (input: {

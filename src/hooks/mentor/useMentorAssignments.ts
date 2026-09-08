@@ -7,7 +7,7 @@ import {
   type CreateAssignmentInput,
 } from "@/lib/api/mentor";
 import type { MentorAssignment } from "@/lib/types";
-import { queryKeys } from "./keys";
+import { queryKeys } from "../keys";
 
 export function useMentorAssignments() {
   return useQuery({
@@ -18,6 +18,7 @@ export function useMentorAssignments() {
 
 export function useCreateAssignment() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (input: CreateAssignmentInput) => createAssignment(input),
     onSuccess: (created) => {
@@ -31,6 +32,7 @@ export function useCreateAssignment() {
 
 export function usePublishAssignment() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (assignmentId: string) => publishAssignment(assignmentId),
     onSuccess: (updated) => {
@@ -44,6 +46,7 @@ export function usePublishAssignment() {
 
 export function useRequestChange() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (vars: { assignmentId: string; message: string }) =>
       requestChange(vars.assignmentId, vars.message),

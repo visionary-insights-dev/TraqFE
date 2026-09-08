@@ -1,5 +1,5 @@
 // src/components/layouts/ScholarLayout.test.tsx
-import { render, screen } from "@/test-utils";
+import { renderWithProviders, screen } from "@/test-utils";
 import { ScholarLayout } from "./index";
 
 describe("ScholarLayout", () => {
@@ -8,7 +8,7 @@ describe("ScholarLayout", () => {
   // management routes. "Home" appears in both the desktop sidebar and the
   // mobile bottom nav, so it renders twice.
   it("renders scholar navigation items", () => {
-    render(
+    renderWithProviders(
       <ScholarLayout>
         <p>Scholar content</p>
       </ScholarLayout>
@@ -24,7 +24,7 @@ describe("ScholarLayout", () => {
 
   // Cross-role isolation: a scholar must not see mentor/admin destinations.
   it("does not expose admin or mentor management routes to a scholar", () => {
-    render(
+    renderWithProviders(
       <ScholarLayout>
         <p>Scholar content</p>
       </ScholarLayout>
@@ -36,7 +36,7 @@ describe("ScholarLayout", () => {
   });
 
   it("renders the mobile bottom navigation", () => {
-    render(
+    renderWithProviders(
       <ScholarLayout>
         <p>Scholar content</p>
       </ScholarLayout>
@@ -45,7 +45,7 @@ describe("ScholarLayout", () => {
   });
 
   it("renders its children", () => {
-    render(
+    renderWithProviders(
       <ScholarLayout>
         <p>Scholar dashboard content</p>
       </ScholarLayout>

@@ -1,4 +1,5 @@
-import { get, post, patch, put } from "./client";
+import axios from "axios";
+import { get, post, patch } from "./client";
 import {
   type AttendanceRosterInput,
   type AttendanceStatus,
@@ -117,7 +118,7 @@ export async function uploadResourceFile(
   uploadUrl: string,
   file: File
 ): Promise<void> {
-  await put(uploadUrl, file, {
+  await axios.put(uploadUrl, file, {
     headers: { "Content-Type": file.type },
   });
 }

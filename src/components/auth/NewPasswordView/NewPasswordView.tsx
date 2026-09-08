@@ -1,11 +1,9 @@
 "use client";
 
-"use client";
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useResetPassword } from "@/hooks/useAuthMutations";
+import { useResetPassword } from "@/hooks/auth";
 import { getResetToken, clearResetState } from "@/stores/passwordReset";
 import {
   newPasswordSchema,

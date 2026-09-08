@@ -2,21 +2,21 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { Meeting, MentorScholar } from "@/lib/types";
 
-jest.mock("@/hooks/useMeetings", () => ({
-  useMeetings: jest.fn(),
+jest.mock("@/hooks/mentor", () => ({
+  useMentorMeetings: jest.fn(),
   useMentorCourses: jest.fn(),
   useCreateMeeting: jest.fn(),
-  useSaveAttendance: jest.fn(),
-}));
-
-const { useMeetings, useMentorCourses, useCreateMeeting, useSaveAttendance } =
-  jest.requireMock("@/hooks/useMeetings");
-
-jest.mock("@/hooks/useMentorScholars", () => ({
+  useRecordAttendance: jest.fn(),
   useMentorScholars: jest.fn(),
 }));
 
-const { useMentorScholars } = jest.requireMock("@/hooks/useMentorScholars");
+const {
+  useMentorMeetings,
+  useMentorCourses,
+  useCreateMeeting,
+  useRecordAttendance,
+  useMentorScholars,
+} = jest.requireMock("@/hooks/mentor");
 
 jest.mock("@/hooks/useConnectivity", () => ({
   useConnectivity: jest.fn(() => true),
@@ -97,39 +97,39 @@ beforeEach(() => {
   useMentorCourses.mockReturnValue(queryResult({ data: [] }));
   useMentorScholars.mockReturnValue(queryResult({ data: sampleScholars }));
   useCreateMeeting.mockReturnValue(mutationResult());
-  useSaveAttendance.mockReturnValue(mutationResult());
+  useRecordAttendance.mockReturnValue(mutationResult());
 });
 
 describe("AttendanceView", () => {
   it("shows skeleton while loading", () => {
-    useMeetings.mockReturnValue(queryResult({ isLoading: true, data: undefined }));
+    useMentorMeetings.mockReturnValue(queryResult({ isLoading: true, data: undefined }));
     render(<AttendanceView />);
     expect(screen.getByLabelText("Loading meetings")).toBeInTheDocument();
   });
 
   it("shows error state with retry", () => {
     const refetch = jest.fn();
-    useMeetings.mockReturnValue(queryResult({ isError: true, status: "error", refetch }));
+    useMentorMeetings.mockReturnValue(queryResult({ isError: true, status: "error", refetch }));
     render(<AttendanceView />);
     expect(screen.getByText("Could not load meetings")).toBeInTheDocument();
   });
 
   it("shows true-empty state", () => {
-    useMeetings.mockReturnValue(queryResult({ data: [] }));
+    useMentorMeetings.mockReturnValue(queryResult({ data: [] }));
     render(<AttendanceView />);
     expect(screen.getByText("No meetings yet")).toBeInTheDocument();
   });
 
   it("renders meetings", () => {
-    useMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
+    useMentorMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
     render(<AttendanceView />);
     expect(screen.getByText("Weekly standup")).toBeInTheDocument();
   });
 
   it("opens attendance roster and marks a scholar present", async () => {
     const mutateAsync = jest.fn().mockResolvedValue(undefined);
-    useSaveAttendance.mockReturnValue(mutationResult({ mutateAsync }));
-    useMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
+    useRecordAttendance.mockReturnValue(mutationResult({ mutateAsync }));
+    useMentorMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
     render(<AttendanceView />);
     const user = (await import("@testing-library/user-event")).default;
 
@@ -144,7 +144,7 @@ describe("AttendanceView", () => {
 
   it("shows offline banner when disconnected", () => {
     useConnectivity.mockReturnValue(false);
-    useMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
+    useMentorMeetings.mockReturnValue(queryResult({ data: sampleMeetings }));
     render(<AttendanceView />);
     expect(screen.getByText(/You're offline/)).toBeInTheDocument();
   });

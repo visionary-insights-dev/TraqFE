@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useVerifyOtp, useForgotPassword } from "@/hooks/useAuthMutations";
+import { useVerifyOtp, useForgotPassword } from "@/hooks/auth";
 import { useCooldown } from "@/hooks/useCooldown";
 import { getResetEmail } from "@/stores/passwordReset";
 import { Button } from "@/components/ui";

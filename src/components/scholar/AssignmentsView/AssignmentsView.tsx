@@ -4,8 +4,8 @@ import { useCallback, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 import { ListChecks, WifiOff } from "lucide-react";
 import {
-  useAssignments,
-  useSubmitAssignment,
+  useScholarAssignments,
+  useMarkAsDone,
   useConnectivity,
   useSocketEvents,
 } from "@/hooks";
@@ -47,11 +47,11 @@ export const AssignmentsView = () => {
 
   const isOnline = useConnectivity();
 
-  const { data, isLoading, isError, refetch } = useAssignments();
-  const submitMutation = useSubmitAssignment(detailId ?? "");
+  const { data, isLoading, isError, refetch } = useScholarAssignments();
+  const submitMutation = useMarkAsDone(detailId ?? "");
 
   useSocketEvents(["assignment.status_changed"], {
-    invalidateKeys: [queryKeys.assignments],
+    invalidateKeys: [queryKeys.scholarAssignments()],
   });
 
   const counts = useMemo(() => {

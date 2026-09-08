@@ -100,7 +100,7 @@ export async function middleware(
     const userRole = payload.role;
     if (!userRole || !config.roles?.includes(userRole)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/";
+      url.pathname = userRole ? ROLE_HOME[userRole] : "/";
       url.search = "";
       return NextResponse.redirect(url);
     }

@@ -1,4 +1,5 @@
 // src/lib/api/client.test.ts
+import axios from "axios";
 import { apiClient, get, post, ApiClientError } from "./index";
 
 // The client is a thin wrapper around the axios instance: it must unwrap the
@@ -84,7 +85,7 @@ describe("api client", () => {
     });
   });
 
-  describe("auth header (interceptor)", () => {
+  describe("auth header (request interceptor)", () => {
     it("attaches the bearer token from the in-memory store", async () => {
       const { setAccessToken, clearAuth } = await import("@/stores/auth");
       setAccessToken("secret-token");
@@ -106,6 +107,62 @@ describe("api client", () => {
       } finally {
         clearAuth();
       }
+    });
+  });
+
+  describe("credentials", () => {
+    it("sends withCredentials so the refresh cookie is stored", () => {
+      expect(apiClient.defaults.withCredentials).toBe(true);
+    });
+  });
+
+  describe("401 refresh + retry", () => {
+    let setAccessToken: (t: string | null) => void;
+    let clearAuth: () => void;
+    let axiosPost: jest.SpyInstance;
+
+    beforeEach(async () => {
+      ({ setAccessToken, clearAuth } = await import("@/stores/auth"));
+      axiosPost = jest.spyOn(axios, "post");
+    });
+
+    afterEach(() => {
+      clearAuth();
+      jest.restoreAllMocks();
+    });
+
+    it("refreshes once, sets the new token, then retries the original request", async () => {
+      setAccessToken("old-token");
+
+      const { refreshAccessToken } = await import("./index");
+      let refreshedToken: string | null = null;
+      axiosPost.mockImplementation(async (url: string) => {
+        if (url.includes("/auth/refresh")) {
+          refreshedToken = "new-token";
+          setAccessToken("new-token");
+          return { data: { success: true, data: { accessToken: "new-token" } } };
+        }
+        throw new Error("unexpected axios call");
+      });
+
+      await refreshAccessToken();
+
+      expect(refreshedToken).toBe("new-token");
+      expect(axiosPost).toHaveBeenCalledWith(
+        expect.stringMatching(/\/auth\/refresh$/),
+        null,
+        expect.objectContaining({ withCredentials: true })
+      );
+    });
+
+    it("clears auth and rejects on refresh failure", async () => {
+      setAccessToken("expired-token");
+      const { refreshAccessToken } = await import("./index");
+      axiosPost.mockRejectedValueOnce({ response: { status: 401 } });
+
+      await expect(refreshAccessToken()).rejects.toBeTruthy();
+      const { getAccessToken } = await import("@/stores/auth");
+      expect(getAccessToken()).toBeNull();
     });
   });
 });

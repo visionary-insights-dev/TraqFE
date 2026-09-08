@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useLogin } from "@/hooks/useAuthMutations";
+import { useLogin } from "@/hooks/auth";
 import { loginSchema, type LoginFormInput } from "@/validators/auth";
 import { getUser } from "@/stores/auth";
 import { Button, Input, Checkbox } from "@/components/ui";
