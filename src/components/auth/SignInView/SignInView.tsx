@@ -2,22 +2,13 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/auth";
 import { loginSchema, type LoginFormInput } from "@/validators/auth";
-import { getUser } from "@/stores/auth";
 import { Button, Input, Checkbox } from "@/components/ui";
 import { AuthCard, AuthErrorBanner } from "@/components/auth";
 import { ApiClientError } from "@/lib/api";
 
-const roleHome: Record<string, string> = {
-  SUPER_ADMIN: "/admin/dashboard",
-  MENTOR: "/mentor/scholars",
-  SCHOLAR: "/scholar/dashboard",
-};
-
 export const SignInView = () => {
-  const router = useRouter();
   const loginMutation = useLogin();
   const {
     register,
@@ -36,17 +27,7 @@ export const SignInView = () => {
         : null;
 
   const onSubmit = (values: LoginFormInput) => {
-    loginMutation.mutate(values, {
-      onSuccess: (data) => {
-        const user = getUser();
-        if (user && user.profileComplete === false) {
-          router.push("/auth/onboarding");
-          return;
-        }
-        const dest = data.user?.role ? roleHome[data.user.role] : undefined;
-        router.push(dest ?? "/");
-      },
-    });
+    loginMutation.mutate(values);
   };
 
   return (
