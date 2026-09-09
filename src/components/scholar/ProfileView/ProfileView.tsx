@@ -2,8 +2,7 @@
 
 import { useRef, useState } from "react";
 import { WifiOff, CheckCircle2 } from "lucide-react";
-import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
-import { useConnectivity } from "@/hooks/useConnectivity";
+import { useScholarProfile, useUpdateProfile, useConnectivity } from "@/hooks";
 import { ErrorState, LoadingSpinner } from "@/components/ui";
 import { PersonalInfoCard } from "./PersonalInfoCard";
 import { NotificationPrefs } from "./NotificationPrefs";
@@ -18,7 +17,7 @@ const DEFAULT_PREFS: NotificationPreferences = {
 };
 
 export const ProfileView = () => {
-  const profileQuery = useProfile();
+  const profileQuery = useScholarProfile();
   const online = useConnectivity();
 
   if (profileQuery.isLoading) {

@@ -3,6 +3,7 @@
 import { Users, ListChecks, Inbox, CalendarCheck, BookOpen, Settings } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/shared/Sidebar";
+import { WebSocketProvider } from "@/components/shared/Providers";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/components/shared/Sidebar/types";
 import type { MentorLayoutProps } from "./types";
@@ -25,15 +26,17 @@ export const MentorLayout = ({ children }: MentorLayoutProps) => {
   }));
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1280px] bg-neutral-50">
-      <Sidebar items={nav} brand={<Brand />} aria-label="Mentor navigation" />
-      <div className="flex flex-1 flex-col">
-        <header className="flex h-16 items-center justify-end border-b border-neutral-200 bg-white px-6">
-          <Avatar />
-        </header>
-        <main className={cn("flex-1 px-6 py-6")}>{children}</main>
+    <WebSocketProvider>
+      <div className="mx-auto flex min-h-screen max-w-[1280px] bg-neutral-50">
+        <Sidebar items={nav} brand={<Brand />} aria-label="Mentor navigation" />
+        <div className="flex flex-1 flex-col">
+          <header className="flex h-16 items-center justify-end border-b border-neutral-200 bg-white px-6">
+            <Avatar />
+          </header>
+          <main className={cn("flex-1 px-6 py-6")}>{children}</main>
+        </div>
       </div>
-    </div>
+    </WebSocketProvider>
   );
 };
 

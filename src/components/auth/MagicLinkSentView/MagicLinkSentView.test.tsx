@@ -6,11 +6,11 @@ jest.mock("next/navigation", () => ({
   useSearchParams: jest.fn(() => new URLSearchParams("email=ada%40example.com")),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useMagicLink: jest.fn(),
 }));
 
-import { useMagicLink } from "@/hooks/useAuthMutations";
+import { useMagicLink } from "@/hooks/auth";
 import { MagicLinkSentView } from "./MagicLinkSentView";
 
 const mockUseMagicLink = useMagicLink as jest.MockedFunction<typeof useMagicLink>;

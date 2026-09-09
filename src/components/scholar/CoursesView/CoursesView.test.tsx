@@ -39,8 +39,8 @@ const courseNoMentor: Course = {
   recentTasks: [],
 };
 
-jest.mock("@/hooks/useCourses", () => ({
-  useCourses: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarCourses: jest.fn(),
 }));
 
 jest.mock("@/hooks/useSocketEvents", () => ({
@@ -52,10 +52,12 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { CoursesView } from "./CoursesView";
-import { useCourses } from "@/hooks/useCourses";
+import { useScholarCourses } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
-const mockUseCourses = useCourses as jest.MockedFunction<typeof useCourses>;
+const mockUseScholarCourses = useScholarCourses as jest.MockedFunction<
+  typeof useScholarCourses
+>;
 
 function queryResult(
   overrides: Partial<UseQueryResult<Course[], Error>>
@@ -99,7 +101,7 @@ describe("CoursesView", () => {
   });
 
   it("shows skeleton while loading", () => {
-    mockUseCourses.mockReturnValue(
+    mockUseScholarCourses.mockReturnValue(
       queryResult({ isLoading: true, isPending: true, data: undefined })
     );
 
@@ -111,7 +113,7 @@ describe("CoursesView", () => {
 
   it("shows error state with retry button", async () => {
     const refetch = jest.fn();
-    mockUseCourses.mockReturnValue(
+    mockUseScholarCourses.mockReturnValue(
       queryResult({
         error: new Error("Network error"),
         isError: true,
@@ -130,7 +132,7 @@ describe("CoursesView", () => {
   });
 
   it("shows empty state when no courses", () => {
-    mockUseCourses.mockReturnValue(queryResult({ data: [] }));
+    mockUseScholarCourses.mockReturnValue(queryResult({ data: [] }));
 
     renderCourses();
 
@@ -138,7 +140,7 @@ describe("CoursesView", () => {
   });
 
   it("renders course cards with progress and mentor", () => {
-    mockUseCourses.mockReturnValue(queryResult({ data: [courseA] }));
+    mockUseScholarCourses.mockReturnValue(queryResult({ data: [courseA] }));
 
     renderCourses();
 
@@ -152,7 +154,7 @@ describe("CoursesView", () => {
   });
 
   it("shows recent tasks on a course", () => {
-    mockUseCourses.mockReturnValue(queryResult({ data: [courseA] }));
+    mockUseScholarCourses.mockReturnValue(queryResult({ data: [courseA] }));
 
     renderCourses();
 
@@ -161,7 +163,7 @@ describe("CoursesView", () => {
   });
 
   it("hides mentor row when no mentor assigned", () => {
-    mockUseCourses.mockReturnValue(
+    mockUseScholarCourses.mockReturnValue(
       queryResult({ data: [courseNoMentor] })
     );
 
@@ -173,7 +175,7 @@ describe("CoursesView", () => {
 
   it("shows offline banner when disconnected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(false);
-    mockUseCourses.mockReturnValue(queryResult({ data: [courseA] }));
+    mockUseScholarCourses.mockReturnValue(queryResult({ data: [courseA] }));
 
     renderCourses();
 
@@ -182,7 +184,7 @@ describe("CoursesView", () => {
 
   it("does not show offline banner when connected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(true);
-    mockUseCourses.mockReturnValue(queryResult({ data: [courseA] }));
+    mockUseScholarCourses.mockReturnValue(queryResult({ data: [courseA] }));
 
     renderCourses();
 
@@ -190,7 +192,7 @@ describe("CoursesView", () => {
   });
 
   it("renders multiple courses in the list", () => {
-    mockUseCourses.mockReturnValue(
+    mockUseScholarCourses.mockReturnValue(
       queryResult({ data: [courseA, courseNoMentor] })
     );
 

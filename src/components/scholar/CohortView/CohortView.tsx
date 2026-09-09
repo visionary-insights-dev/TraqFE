@@ -2,14 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { Users, WifiOff, Search, X } from "lucide-react";
-import { useCohort, useConnectivity } from "@/hooks";
+import { useScholarCohort, useConnectivity } from "@/hooks";
 import type { CohortMember } from "@/lib/types";
 import { EmptyState, ErrorState } from "@/components/ui";
 import { MemberRow } from "./MemberRow";
 
 export const CohortView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useCohort();
+  const { data, isLoading, isError, refetch } = useScholarCohort();
   const [search, setSearch] = useState("");
 
   const members = useMemo<{

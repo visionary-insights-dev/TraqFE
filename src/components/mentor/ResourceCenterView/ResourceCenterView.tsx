@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { FolderOpen, UploadCloud, WifiOff } from "lucide-react";
 import {
   useUploadResource,
-  useResources,
+  useMentorResources,
   useMentorCourses,
   useConnectivity,
 } from "@/hooks";
@@ -25,7 +25,7 @@ const TYPE_OPTIONS: Array<{ value: ResourceTypeFilter; label: string }> = [
 
 export const ResourceCenterView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useResources();
+  const { data, isLoading, isError, refetch } = useMentorResources();
   const { data: courses = [] } = useMentorCourses();
   const uploadMutation = useUploadResource();
   const [uploadOpen, setUploadOpen] = useState(false);

@@ -1,7 +1,7 @@
 "use client";
 
 import { WifiOff } from "lucide-react";
-import { useDashboardAnalytics } from "@/hooks/useDashboardAnalytics";
+import { useScholarDashboard } from "@/hooks";
 import { useSocketEvents } from "@/hooks/useSocketEvents";
 import { useConnectivity } from "@/hooks/useConnectivity";
 import { queryKeys } from "@/hooks/keys";
@@ -12,11 +12,11 @@ import { MentorCard } from "./MentorCard";
 import { AttendanceSummary } from "./AttendanceSummary";
 
 export const DashboardView = () => {
-  const { data, isLoading, error, refetch } = useDashboardAnalytics();
+  const { data, isLoading, error, refetch } = useScholarDashboard();
   const isOnline = useConnectivity();
 
   useSocketEvents(["analytics.course.updated"], {
-    invalidateKeys: [queryKeys.dashboardAnalytics],
+    invalidateKeys: [queryKeys.scholarDashboard],
   });
 
   if (isLoading) {

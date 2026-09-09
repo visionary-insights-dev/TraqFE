@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Inbox, WifiOff } from "lucide-react";
 import {
-  useVerificationQueue,
+  useMentorVerificationQueue,
   useVerifySubmission,
   useRequestResubmission,
   useConnectivity,
@@ -17,7 +17,7 @@ import type { VerificationItem } from "@/lib/types";
 
 export const VerificationQueueView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useVerificationQueue();
+  const { data, isLoading, isError, refetch } = useMentorVerificationQueue();
   const verifyMutation = useVerifySubmission();
   const resubmitMutation = useRequestResubmission();
   const [resubmitItem, setResubmitItem] = useState<VerificationItem | null>(

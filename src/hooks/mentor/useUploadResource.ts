@@ -5,7 +5,7 @@ import {
   uploadResourceFile,
 } from "@/lib/api/mentor";
 import type { Resource, ResourceType } from "@/lib/types";
-import { queryKeys } from "./keys";
+import { queryKeys } from "../keys";
 
 export type ResourceUploadVars =
   | {
@@ -23,6 +23,7 @@ export type ResourceUploadVars =
 
 export function useUploadResource() {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (vars: ResourceUploadVars) => {
       if ("url" in vars) {
@@ -46,7 +47,7 @@ export function useUploadResource() {
       });
     },
     onSuccess: (created: Resource) => {
-      queryClient.setQueryData<Resource[]>(queryKeys.resources, (old) =>
+      queryClient.setQueryData<Resource[]>(queryKeys.mentorResources, (old) =>
         old ? [...old, created] : [created]
       );
     },

@@ -19,11 +19,19 @@ export function getUser(): User | null {
   return currentUser;
 }
 
+export function clearAccessToken(): void {
+  accessToken = null;
+}
+
+export function clearUser(): void {
+  currentUser = null;
+}
+
 export function isAuthenticated(): boolean {
   return accessToken !== null;
 }
 
 export function clearAuth(): void {
-  accessToken = null;
-  currentUser = null;
+  clearAccessToken();
+  clearUser();
 }

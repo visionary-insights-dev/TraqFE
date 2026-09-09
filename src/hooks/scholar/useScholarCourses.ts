@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { getMyCourses } from "@/lib/api/scholar";
-import { queryKeys } from "./keys";
+import { queryKeys } from "../keys";
 
-export function useCourses() {
+export function useScholarCourses() {
   return useQuery({
-    queryKey: queryKeys.courses,
+    queryKey: queryKeys.scholarCourses,
     queryFn: getMyCourses,
   });
 }

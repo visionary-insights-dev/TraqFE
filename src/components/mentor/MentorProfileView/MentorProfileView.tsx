@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { CheckCircle2, WifiOff } from "lucide-react";
-import { useMentorProfile, useUpdateMentorProfile } from "@/hooks/useMentorProfile";
+import { useMentorProfile, useUpdateMentorProfile } from "@/hooks";
 import { useConnectivity } from "@/hooks/useConnectivity";
 import { Button, Card, CardContent, ErrorState, Input, LoadingSpinner } from "@/components/ui";
 import { Toggle } from "./Toggle";

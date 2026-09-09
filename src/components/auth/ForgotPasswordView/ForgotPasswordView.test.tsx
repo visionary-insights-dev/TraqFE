@@ -9,11 +9,11 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: pushMock })),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useForgotPassword: jest.fn(),
 }));
 
-import { useForgotPassword } from "@/hooks/useAuthMutations";
+import { useForgotPassword } from "@/hooks/auth";
 import { ForgotPasswordView } from "./ForgotPasswordView";
 
 const mockUseForgotPassword = useForgotPassword as jest.MockedFunction<typeof useForgotPassword>;

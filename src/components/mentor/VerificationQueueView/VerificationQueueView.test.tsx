@@ -2,8 +2,8 @@ import { render, screen } from "@/test-utils";
 import type { UseQueryResult } from "@tanstack/react-query";
 import type { VerificationItem } from "@/lib/types";
 
-jest.mock("@/hooks/useVerificationQueue", () => ({
-  useVerificationQueue: jest.fn(),
+jest.mock("@/hooks/mentor", () => ({
+  useMentorVerificationQueue: jest.fn(),
   useVerifySubmission: jest.fn(),
   useRequestResubmission: jest.fn(),
 }));
@@ -16,8 +16,11 @@ jest.mock("@/hooks/useSocketEvents", () => ({
   useSocketEvents: jest.fn(),
 }));
 
-const { useVerificationQueue, useVerifySubmission, useRequestResubmission } =
-  jest.requireMock("@/hooks/useVerificationQueue");
+const {
+  useMentorVerificationQueue,
+  useVerifySubmission,
+  useRequestResubmission,
+} = jest.requireMock("@/hooks/mentor");
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
 const sampleQueue: VerificationItem[] = [
@@ -98,7 +101,7 @@ beforeEach(() => {
 
 describe("VerificationQueueView", () => {
   it("shows skeleton while loading", () => {
-    useVerificationQueue.mockReturnValue(
+    useMentorVerificationQueue.mockReturnValue(
       queryResult({ isLoading: true, data: undefined })
     );
     render(<VerificationQueueView />);
@@ -109,7 +112,7 @@ describe("VerificationQueueView", () => {
 
   it("shows error state with retry", () => {
     const refetch = jest.fn();
-    useVerificationQueue.mockReturnValue(
+    useMentorVerificationQueue.mockReturnValue(
       queryResult({ isError: true, status: "error", refetch })
     );
     render(<VerificationQueueView />);
@@ -119,13 +122,13 @@ describe("VerificationQueueView", () => {
   });
 
   it("shows clear queue empty state", () => {
-    useVerificationQueue.mockReturnValue(queryResult({ data: [] }));
+    useMentorVerificationQueue.mockReturnValue(queryResult({ data: [] }));
     render(<VerificationQueueView />);
     expect(screen.getByText("Queue is clear")).toBeInTheDocument();
   });
 
   it("renders queue items with verify and request buttons", () => {
-    useVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
+    useMentorVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
     render(<VerificationQueueView />);
     expect(screen.getByText("Build a REST API")).toBeInTheDocument();
     expect(screen.getByText("Grace Hopper")).toBeInTheDocument();
@@ -136,7 +139,7 @@ describe("VerificationQueueView", () => {
   it("calls verify mutation on verify click", async () => {
     const mutate = jest.fn();
     useVerifySubmission.mockReturnValue(mutationResult({ mutate }));
-    useVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
+    useMentorVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
     render(<VerificationQueueView />);
     const user = (await import("@testing-library/user-event")).default;
     await user.click(screen.getAllByText("Verify")[0]);
@@ -145,7 +148,7 @@ describe("VerificationQueueView", () => {
 
   it("shows offline banner when disconnected", () => {
     useConnectivity.mockReturnValue(false);
-    useVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
+    useMentorVerificationQueue.mockReturnValue(queryResult({ data: sampleQueue }));
     render(<VerificationQueueView />);
     expect(screen.getByText(/You're offline/)).toBeInTheDocument();
   });

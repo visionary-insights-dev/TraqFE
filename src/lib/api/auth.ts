@@ -9,7 +9,13 @@ import {
 } from "@/lib/types";
 
 export function login(input: LoginPayload): Promise<LoginResponse> {
-  return post<LoginResponse>("/auth/login", input);
+  // rememberMe is a client-only UX preference. Sending it to the API is
+  // rejected by the backend's strict DTO validation, so it never leaves the
+  // client.
+  return post<LoginResponse>("/auth/login", {
+    email: input.email,
+    password: input.password,
+  });
 }
 
 export function magicLink(email: string): Promise<void> {
@@ -31,7 +37,14 @@ export function resetPassword(
   token: string,
   password: string
 ): Promise<void> {
-  return post<void>("/auth/reset-password", { token, password });
+  return post<void>("/auth/reset-password", {
+    resetToken: token,
+    newPassword: password,
+  });
+}
+
+export function logout(): Promise<void> {
+  return post<void>("/auth/logout");
 }
 
 export function updateMyProfile(
@@ -44,7 +57,7 @@ export function getProfileUploadUrl(
   filename: string,
   contentType: string
 ): Promise<ResourceUploadUrl> {
-  return post<ResourceUploadUrl>("/uploads/presigned-url", {
+  return post<ResourceUploadUrl>("/resources/upload-url", {
     filename,
     contentType,
   });

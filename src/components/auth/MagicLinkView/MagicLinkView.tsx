@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useMagicLink } from "@/hooks/useAuthMutations";
+import { useMagicLink } from "@/hooks/auth";
 import { magicLinkSchema, type MagicLinkFormInput } from "@/validators/auth";
 import { Button, Input } from "@/components/ui";
 import { AuthCard, AuthErrorBanner } from "@/components/auth";

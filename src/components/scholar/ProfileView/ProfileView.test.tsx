@@ -16,8 +16,8 @@ const profile: ScholarProfile = {
   },
 };
 
-jest.mock("@/hooks/useProfile", () => ({
-  useProfile: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarProfile: jest.fn(),
   useUpdateProfile: jest.fn(),
 }));
 
@@ -26,10 +26,12 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { ProfileView } from "./ProfileView";
-import { useProfile, useUpdateProfile } from "@/hooks/useProfile";
+import { useScholarProfile, useUpdateProfile } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
-const mockUseProfile = useProfile as jest.MockedFunction<typeof useProfile>;
+const mockUseScholarProfile = useScholarProfile as jest.MockedFunction<
+  typeof useScholarProfile
+>;
 const mockUseUpdateProfile = useUpdateProfile as jest.MockedFunction<
   typeof useUpdateProfile
 >;
@@ -96,12 +98,12 @@ function renderProfile() {
 describe("ProfileView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseProfile.mockReturnValue(profileQueryResult({ data: profile }));
+    mockUseScholarProfile.mockReturnValue(profileQueryResult({ data: profile }));
     mockUseUpdateProfile.mockReturnValue(mutationResult(jest.fn()));
   });
 
   it("shows loading while profile loads", () => {
-    mockUseProfile.mockReturnValue(
+    mockUseScholarProfile.mockReturnValue(
       profileQueryResult({ isLoading: true, isPending: true, data: undefined })
     );
 
@@ -112,7 +114,7 @@ describe("ProfileView", () => {
 
   it("shows error state with retry", () => {
     const refetch = jest.fn();
-    mockUseProfile.mockReturnValue(
+    mockUseScholarProfile.mockReturnValue(
       profileQueryResult({ error: new Error("x"), isError: true, status: "error", refetch })
     );
 

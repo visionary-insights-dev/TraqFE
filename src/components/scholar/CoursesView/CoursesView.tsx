@@ -1,17 +1,17 @@
 "use client";
 
 import { GraduationCap, WifiOff } from "lucide-react";
-import { useCourses, useConnectivity, useSocketEvents } from "@/hooks";
+import { useScholarCourses, useConnectivity, useSocketEvents } from "@/hooks";
 import { queryKeys } from "@/hooks/keys";
 import { EmptyState, ErrorState } from "@/components/ui";
 import { CourseCard } from "./CourseCard";
 
 export const CoursesView = () => {
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useCourses();
+  const { data, isLoading, isError, refetch } = useScholarCourses();
 
   useSocketEvents(["analytics.course.updated"], {
-    invalidateKeys: [queryKeys.courses],
+    invalidateKeys: [queryKeys.scholarCourses],
   });
 
   if (isLoading) {

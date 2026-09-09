@@ -6,6 +6,8 @@ import {
   getUser,
   isAuthenticated,
   clearAuth,
+  clearAccessToken,
+  clearUser,
 } from "./auth";
 import { type User } from "./types";
 
@@ -54,5 +56,37 @@ describe("auth store", () => {
     expect(getAccessToken()).toBeNull();
     expect(getUser()).toBeNull();
     expect(isAuthenticated()).toBe(false);
+  });
+
+  it("clears only the access token via clearAccessToken", () => {
+    setAccessToken("token-123");
+    setUser({
+      id: "u1",
+      email: "a@b.com",
+      name: "A",
+      role: "SCHOLAR",
+      organizationId: "org-1",
+    });
+
+    clearAccessToken();
+
+    expect(getAccessToken()).toBeNull();
+    expect(getUser()).not.toBeNull();
+  });
+
+  it("clears only the user via clearUser", () => {
+    setAccessToken("token-123");
+    setUser({
+      id: "u1",
+      email: "a@b.com",
+      name: "A",
+      role: "SCHOLAR",
+      organizationId: "org-1",
+    });
+
+    clearUser();
+
+    expect(getAccessToken()).toBe("token-123");
+    expect(getUser()).toBeNull();
   });
 });

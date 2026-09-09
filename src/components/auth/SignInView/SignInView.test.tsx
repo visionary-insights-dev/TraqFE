@@ -11,11 +11,11 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(() => ({ push: pushMock })),
 }));
 
-jest.mock("@/hooks/useAuthMutations", () => ({
+jest.mock("@/hooks/auth", () => ({
   useLogin: jest.fn(),
 }));
 
-import { useLogin } from "@/hooks/useAuthMutations";
+import { useLogin } from "@/hooks/auth";
 import { SignInView } from "./SignInView";
 
 const mockUseLogin = useLogin as jest.MockedFunction<typeof useLogin>;

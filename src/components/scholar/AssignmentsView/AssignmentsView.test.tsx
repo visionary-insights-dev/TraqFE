@@ -51,9 +51,9 @@ jest.mock("next/navigation", () => ({
   useParams: jest.fn(() => ({})),
 }));
 
-jest.mock("@/hooks/useAssignments", () => ({
-  useAssignments: jest.fn(),
-  useSubmitAssignment: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarAssignments: jest.fn(),
+  useMarkAsDone: jest.fn(),
 }));
 
 jest.mock("@/hooks/useConnectivity", () => ({
@@ -64,8 +64,8 @@ jest.mock("@/hooks/useSocketEvents", () => ({
   useSocketEvents: jest.fn(),
 }));
 
-const { useAssignments, useSubmitAssignment } = jest.requireMock(
-  "@/hooks/useAssignments"
+const { useScholarAssignments, useMarkAsDone } = jest.requireMock(
+  "@/hooks/scholar"
 );
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
@@ -112,12 +112,12 @@ const mockSubmit = {
 beforeEach(() => {
   jest.clearAllMocks();
   useConnectivity.mockReturnValue(true);
-  useSubmitAssignment.mockReturnValue(mockSubmit);
+  useMarkAsDone.mockReturnValue(mockSubmit);
 });
 
 describe("AssignmentsView", () => {
   it("shows skeleton while loading", () => {
-    useAssignments.mockReturnValue(
+    useScholarAssignments.mockReturnValue(
       queryResult({ isLoading: true, data: undefined })
     );
 
@@ -127,7 +127,7 @@ describe("AssignmentsView", () => {
 
   it("shows error state with retry", () => {
     const refetch = jest.fn();
-    useAssignments.mockReturnValue(
+    useScholarAssignments.mockReturnValue(
       queryResult({ isError: true, status: "error", refetch })
     );
 
@@ -138,14 +138,14 @@ describe("AssignmentsView", () => {
   });
 
   it("shows true-empty state when no assignments", () => {
-    useAssignments.mockReturnValue(queryResult({ data: [] }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: [] }));
 
     render(<AssignmentsView />);
     expect(screen.getByText("No assignments yet")).toBeInTheDocument();
   });
 
   it("renders all assignments by default", () => {
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     render(<AssignmentsView />);
     expect(screen.getByText("Build a REST API")).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe("AssignmentsView", () => {
   });
 
   it("filters by Pending", async () => {
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     render(<AssignmentsView />);
     const user = (await import("@testing-library/user-event")).default;
@@ -169,7 +169,7 @@ describe("AssignmentsView", () => {
   });
 
   it("shows filtered-empty when no tasks match a filter", async () => {
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     render(<AssignmentsView />);
     const user = (await import("@testing-library/user-event")).default;
@@ -185,7 +185,7 @@ describe("AssignmentsView", () => {
 
   it("shows offline banner when disconnected", () => {
     useConnectivity.mockReturnValue(false);
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     render(<AssignmentsView />);
     expect(
@@ -195,8 +195,8 @@ describe("AssignmentsView", () => {
 
   it("opens detail modal and submits Mark as Done", async () => {
     const mutateAsync = jest.fn().mockResolvedValue(undefined);
-    useSubmitAssignment.mockReturnValue({ ...mockSubmit, mutateAsync });
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useMarkAsDone.mockReturnValue({ ...mockSubmit, mutateAsync });
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     const user = (await import("@testing-library/user-event")).default;
     render(<AssignmentsView />);
@@ -215,7 +215,7 @@ describe("AssignmentsView", () => {
 
   it("shows offline alert inside detail modal and hides Mark as Done", async () => {
     useConnectivity.mockReturnValue(false);
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     const user = (await import("@testing-library/user-event")).default;
     render(<AssignmentsView />);
@@ -240,7 +240,7 @@ describe("AssignmentsView", () => {
   });
 
   it("disables Mark as Done for already-submitted status", async () => {
-    useAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
+    useScholarAssignments.mockReturnValue(queryResult({ data: sampleAssignments }));
 
     const user = (await import("@testing-library/user-event")).default;
     render(<AssignmentsView />);

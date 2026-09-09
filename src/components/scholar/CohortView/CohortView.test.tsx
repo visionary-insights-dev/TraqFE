@@ -14,8 +14,8 @@ const cohort: Cohort = {
   members,
 };
 
-jest.mock("@/hooks/useCohort", () => ({
-  useCohort: jest.fn(),
+jest.mock("@/hooks/scholar", () => ({
+  useScholarCohort: jest.fn(),
 }));
 
 jest.mock("@/hooks/useConnectivity", () => ({
@@ -23,10 +23,12 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { CohortView } from "./CohortView";
-import { useCohort } from "@/hooks/useCohort";
+import { useScholarCohort } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
-const mockUseCohort = useCohort as jest.MockedFunction<typeof useCohort>;
+const mockUseScholarCohort = useScholarCohort as jest.MockedFunction<
+  typeof useScholarCohort
+>;
 
 function queryResult(
   overrides: Partial<UseQueryResult<Cohort, Error>>
@@ -70,7 +72,7 @@ describe("CohortView", () => {
   });
 
   it("shows skeleton while loading", () => {
-    mockUseCohort.mockReturnValue(
+    mockUseScholarCohort.mockReturnValue(
       queryResult({ isLoading: true, isPending: true, data: undefined })
     );
 
@@ -82,7 +84,7 @@ describe("CohortView", () => {
 
   it("shows error state with retry button", () => {
     const refetch = jest.fn();
-    mockUseCohort.mockReturnValue(
+    mockUseScholarCohort.mockReturnValue(
       queryResult({
         error: new Error("Network error"),
         isError: true,
@@ -100,7 +102,7 @@ describe("CohortView", () => {
   });
 
   it("shows empty state when no cohort members", () => {
-    mockUseCohort.mockReturnValue(
+    mockUseScholarCohort.mockReturnValue(
       queryResult({ data: { ...cohort, members: [] } })
     );
 
@@ -110,7 +112,7 @@ describe("CohortView", () => {
   });
 
   it("renders cohort name and member count", () => {
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
@@ -122,7 +124,7 @@ describe("CohortView", () => {
   });
 
   it("groups mentors and scholars", () => {
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
@@ -135,7 +137,7 @@ describe("CohortView", () => {
   });
 
   it("searches members by name", async () => {
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
@@ -147,7 +149,7 @@ describe("CohortView", () => {
   });
 
   it("shows no-results empty state and clears search", async () => {
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
@@ -161,7 +163,7 @@ describe("CohortView", () => {
 
   it("shows offline banner when disconnected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(false);
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
@@ -170,7 +172,7 @@ describe("CohortView", () => {
 
   it("does not show offline banner when connected", () => {
     (useConnectivity as jest.Mock).mockReturnValue(true);
-    mockUseCohort.mockReturnValue(queryResult({ data: cohort }));
+    mockUseScholarCohort.mockReturnValue(queryResult({ data: cohort }));
 
     renderCohort();
 
