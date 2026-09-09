@@ -6,7 +6,6 @@ export * from "./useChat";
 export * from "./useConnectivity";
 export * from "./useSocketEvents";
 export * from "./useCooldown";
-export * from "./useAuthMutations";
 export * from "./useAdminDashboard";
 export * from "./useAdminSocketEvents";
 export * from "./usePrograms";
