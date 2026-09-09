@@ -1,7 +1,30 @@
 import { type User } from "./types";
 
+const REMEMBER_ME_KEY = "traq_remember_me";
+
 let accessToken: string | null = null;
 let currentUser: User | null = null;
+
+export function getRemembered(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(REMEMBER_ME_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function setRemembered(remember: boolean): void {
+  try {
+    if (remember) {
+      window.localStorage.setItem(REMEMBER_ME_KEY, "1");
+    } else {
+      window.localStorage.removeItem(REMEMBER_ME_KEY);
+    }
+  } catch {
+    return;
+  }
+}
 
 export function setAccessToken(token: string | null): void {
   accessToken = token;

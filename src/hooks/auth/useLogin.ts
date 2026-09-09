@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { login } from "@/lib/api/auth";
-import { setAccessToken, setUser } from "@/stores/auth";
+import { setAccessToken, setRemembered, setUser } from "@/stores/auth";
 import type { LoginPayload } from "@/lib/types";
 
 const roleHome: Record<string, string> = {
@@ -15,9 +15,10 @@ export function useLogin() {
 
   return useMutation({
     mutationFn: (input: LoginPayload) => login(input),
-    onSuccess: (data) => {
+    onSuccess: (data, variables) => {
       setAccessToken(data.accessToken);
       setUser(data.user);
+      setRemembered(variables.rememberMe ?? false);
 
       if (data.user.profileComplete === false) {
         router.push("/auth/onboarding");
