@@ -1,0 +1,1 @@
+export { VerificationQueueView } from "./VerificationQueueView";

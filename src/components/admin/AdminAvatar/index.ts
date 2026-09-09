@@ -1,0 +1,1 @@
+export { AdminAvatar, type AdminAvatarProps } from "./AdminAvatar";

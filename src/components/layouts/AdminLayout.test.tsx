@@ -18,9 +18,9 @@ describe("AdminLayout", () => {
       "href",
       "/admin/programs"
     );
-    expect(screen.getByRole("link", { name: "People" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Scholars" })).toHaveAttribute(
       "href",
-      "/admin/people"
+      "/admin/scholars"
     );
     expect(screen.getByRole("link", { name: "Audit Log" })).toHaveAttribute(
       "href",
@@ -40,11 +40,14 @@ describe("AdminLayout", () => {
     const expected = [
       "Programs",
       "Courses",
-      "People",
-      "Sort or Pair",
+      "Scholars",
+      "Mentors",
+      "Sort & Pair",
       "Assignments",
       "Attendance",
-      "Reports",
+      "Meetings",
+      "Invitations",
+      "Analytics",
       "Audit Log",
       "Settings",
     ];
