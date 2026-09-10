@@ -282,8 +282,26 @@ body {
   background-attachment: fixed;
 }
 
+/* Cooler, denser wash for the admin shell (1440px desktop-first) */
+.admin-shell {
+  background-color: var(--color-neutral-50);
+  background-image:
+    radial-gradient(
+      72rem 42rem at 118% -12%,
+      var(--color-brand-100),
+      transparent 58%
+    ),
+    radial-gradient(
+      58rem 38rem at -12% 118%,
+      var(--color-secondary-100),
+      transparent 52%
+    );
+  background-attachment: fixed;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .scholar-shell {
+  .scholar-shell,
+  .admin-shell {
     background-attachment: scroll;
   }
 }

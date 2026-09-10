@@ -25,6 +25,18 @@ export function connectSocket(userId: string): Socket {
   return s;
 }
 
+/** Joins the admin's personal room and the org-wide admins room. */
+export function connectAdminSocket(userId: string, orgId: string): Socket {
+  const s = getSocket();
+  if (!s.connected) {
+    s.auth = { token: getAccessToken() };
+    s.connect();
+    s.emit("join", { room: `user:${userId}` });
+    s.emit("join", { room: `organization:${orgId}:admins` });
+  }
+  return s;
+}
+
 export function disconnectSocket(): void {
   if (socket?.connected) socket.disconnect();
 }

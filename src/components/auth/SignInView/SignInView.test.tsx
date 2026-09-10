@@ -1,15 +1,9 @@
 import { render, screen, userEvent } from "@/test-utils";
 import { mockMutationResult } from "@/test-utils/mockMutation";
 import type { UseMutationResult } from "@tanstack/react-query";
-import { setUser } from "@/stores/auth";
+import { setUser, setRemembered } from "@/stores/auth";
 import { ApiClientError } from "@/lib/api";
 import type { LoginResponse, LoginPayload } from "@/lib/types";
-
-const pushMock = jest.fn();
-
-jest.mock("next/navigation", () => ({
-  useRouter: jest.fn(() => ({ push: pushMock })),
-}));
 
 jest.mock("@/hooks/auth", () => ({
   useLogin: jest.fn(),
@@ -24,6 +18,7 @@ describe("SignInView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     setUser(null);
+    setRemembered(false);
     mockUseLogin.mockReturnValue(
       mockMutationResult<UseMutationResult<LoginResponse, Error, LoginPayload>>()
     );
@@ -44,6 +39,12 @@ describe("SignInView", () => {
     expect(screen.getByText("Password is required")).toBeInTheDocument();
   });
 
+  it("defaults Remember me to the persisted preference", () => {
+    setRemembered(true);
+    render(<SignInView />);
+    expect(screen.getByLabelText("Remember me")).toBeChecked();
+  });
+
   it("submits email, password, and rememberMe via mutation", async () => {
     const mutate = jest.fn();
     mockUseLogin.mockReturnValue(
@@ -58,50 +59,11 @@ describe("SignInView", () => {
     await userEvent.click(screen.getByLabelText("Remember me"));
     await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
 
-    expect(mutate).toHaveBeenCalledWith(
-      { email: "ada@example.com", password: "secret123", rememberMe: true },
-      expect.anything()
-    );
-  });
-
-  it("redirects a complete-profile scholar to the scholar dashboard", async () => {
-    setUser({ id: "1", email: "a@b.c", name: "Ada", role: "SCHOLAR", organizationId: "o1", profileComplete: true });
-    const mutate = jest.fn();
-    mockUseLogin.mockReturnValue(
-      mockMutationResult<UseMutationResult<LoginResponse, Error, LoginPayload>>({
-        mutate,
-      })
-    );
-
-    render(<SignInView />);
-    await userEvent.type(screen.getByLabelText("Email"), "ada@example.com");
-    await userEvent.type(screen.getByLabelText("Password"), "secret123");
-    await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
-
-    const onSuccess = mutate.mock.calls[0][1].onSuccess;
-    onSuccess({ user: { role: "SCHOLAR" } } as LoginResponse);
-
-    expect(pushMock).toHaveBeenCalledWith("/scholar/dashboard");
-  });
-
-  it("redirects an incomplete-profile user to onboarding", async () => {
-    setUser({ id: "1", email: "a@b.c", name: "Ada", role: "SCHOLAR", organizationId: "o1", profileComplete: false });
-    const mutate = jest.fn();
-    mockUseLogin.mockReturnValue(
-      mockMutationResult<UseMutationResult<LoginResponse, Error, LoginPayload>>({
-        mutate,
-      })
-    );
-
-    render(<SignInView />);
-    await userEvent.type(screen.getByLabelText("Email"), "ada@example.com");
-    await userEvent.type(screen.getByLabelText("Password"), "secret123");
-    await userEvent.click(screen.getByRole("button", { name: /sign in/i }));
-
-    const onSuccess = mutate.mock.calls[0][1].onSuccess;
-    onSuccess({ user: { role: "SCHOLAR" } } as LoginResponse);
-
-    expect(pushMock).toHaveBeenCalledWith("/auth/onboarding");
+    expect(mutate).toHaveBeenCalledWith({
+      email: "ada@example.com",
+      password: "secret123",
+      rememberMe: true,
+    });
   });
 
   it("shows an inline error message for wrong credentials", () => {

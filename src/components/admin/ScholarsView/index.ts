@@ -1,0 +1,1 @@
+export { ScholarsView } from "./ScholarsView";

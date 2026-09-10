@@ -1,8 +1,9 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLogin } from "@/hooks/auth";
+import { getRemembered } from "@/stores/auth";
 import { loginSchema, type LoginFormInput } from "@/validators/auth";
 import { Button, Input, Checkbox } from "@/components/ui";
 import { AuthCard, AuthErrorBanner } from "@/components/auth";
@@ -11,12 +12,13 @@ import { ApiClientError } from "@/lib/api";
 export const SignInView = () => {
   const loginMutation = useLogin();
   const {
+    control,
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInput>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { rememberMe: false },
+    defaultValues: { rememberMe: getRemembered() },
   });
 
   const errorMessage =
@@ -68,10 +70,18 @@ export const SignInView = () => {
         />
 
         <div className="flex items-center justify-between">
-          <Checkbox
-            id="rememberMe"
-            label="Remember me"
-            {...register("rememberMe")}
+          <Controller
+            control={control}
+            name="rememberMe"
+            render={({ field }) => (
+              <Checkbox
+                id="rememberMe"
+                label="Remember me"
+                checked={field.value}
+                onBlur={field.onBlur}
+                onChange={field.onChange}
+              />
+            )}
           />
           <a
             href="/auth/forgot-password"

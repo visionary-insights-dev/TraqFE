@@ -1,0 +1,1 @@
+export { SubmissionDetailView } from "./SubmissionDetailView";

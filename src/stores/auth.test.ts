@@ -8,6 +8,8 @@ import {
   clearAuth,
   clearAccessToken,
   clearUser,
+  getRemembered,
+  setRemembered,
 } from "./auth";
 import { type User } from "./types";
 
@@ -88,5 +90,17 @@ describe("auth store", () => {
 
     expect(getAccessToken()).toBe("token-123");
     expect(getUser()).toBeNull();
+  });
+
+  it("defaults the remember-me preference to false", () => {
+    expect(getRemembered()).toBe(false);
+  });
+
+  it("persists and clears the remember-me preference", () => {
+    setRemembered(true);
+    expect(getRemembered()).toBe(true);
+
+    setRemembered(false);
+    expect(getRemembered()).toBe(false);
   });
 });
