@@ -7,13 +7,15 @@ jest.mock("@/hooks/usePrograms", () => ({
   usePrograms: jest.fn(),
   useCreateProgram: jest.fn(),
   useArchiveProgram: jest.fn(),
+  useUnarchiveProgram: jest.fn(),
 }));
 
 jest.mock("@/hooks/useConnectivity", () => ({
   useConnectivity: jest.fn(() => true),
 }));
 
-const { usePrograms, useArchiveProgram } = jest.requireMock("@/hooks/usePrograms");
+const { usePrograms, useArchiveProgram, useUnarchiveProgram } =
+  jest.requireMock("@/hooks/usePrograms");
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
 const samplePrograms: Program[] = [
@@ -88,6 +90,7 @@ beforeEach(() => {
   useConnectivity.mockReturnValue(true);
   usePrograms.mockReturnValue(queryResult<Program[]>({ data: samplePrograms }));
   useArchiveProgram.mockReturnValue(mutationResult());
+  useUnarchiveProgram.mockReturnValue(mutationResult());
 });
 
 describe("ProgramsView", () => {

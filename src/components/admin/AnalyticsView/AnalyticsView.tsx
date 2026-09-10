@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, CheckCircle2, Download, Loader2, WifiOff } from "lucide-react";
+import { BarChart3, CheckCircle2, Loader2, WifiOff } from "lucide-react";
 import { AdminPageHeader, DataTable, type DataTableColumn } from "@/components/admin";
 import { Badge, Button, Checkbox, ErrorState, Input, Label } from "@/components/ui";
-import { useConnectivity, useCreateReport, usePrograms, useReportTask, useReports } from "@/hooks";
+import { useConnectivity, useCreateReport, useDownloadReport, usePrograms, useReportTask, useReports } from "@/hooks";
 import { reportSchema } from "@/validators";
 import { formatDateTime, relativeTime } from "@/lib/utils";
 import type { Report, ReportStatus } from "@/lib/types";
@@ -21,14 +21,42 @@ export const AnalyticsView = () => {
   const { data: reports, isLoading, isError, refetch } = useReports();
   const { data: programs } = usePrograms();
   const createMutation = useCreateReport();
+  const downloadMutation = useDownloadReport();
 
   const [name, setName] = useState("");
   const [programId, setProgramId] = useState("");
   const [includeAtRisk, setIncludeAtRisk] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [trackedId, setTrackedId] = useState<string | null>(null);
 
   const trackedQuery = useReportTask(isRunning(trackedId) ? trackedId : null);
+
+  const handleDownload = async (report: Report, format: "csv" | "pdf") => {
+    setDownloadError(null);
+    setDownloadingId(report.id);
+    try {
+      const blob = await downloadMutation.mutateAsync({
+        reportId: report.id,
+        format,
+      });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `${report.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.${format}`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setDownloadError(
+        err instanceof Error ? err.message : "Could not download the report."
+      );
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   if (isLoading) {
     return <AnalyticsSkeleton />;
@@ -119,16 +147,30 @@ export const AnalyticsView = () => {
       header: "",
       className: "text-right",
       render: (r) => {
-        if (r.status === "COMPLETED" && r.downloadUrl) {
+        if (r.status === "COMPLETED") {
           return (
-            <a
-              href={r.downloadUrl}
-              download
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-700 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
-            >
-              <Download className="h-3.5 w-3.5" aria-hidden="true" />
-              Download
-            </a>
+            <div className="flex justify-end gap-1.5">
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={downloadingId !== null}
+                loading={downloadingId === r.id && downloadMutation.isPending}
+                onClick={() => handleDownload(r, "csv")}
+                aria-label={`Download ${r.name} as CSV`}
+              >
+                CSV
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={downloadingId !== null}
+                loading={downloadingId === r.id && downloadMutation.isPending}
+                onClick={() => handleDownload(r, "pdf")}
+                aria-label={`Download ${r.name} as PDF`}
+              >
+                PDF
+              </Button>
+            </div>
           );
         }
         if (r.status === "FAILED") {
@@ -248,6 +290,14 @@ export const AnalyticsView = () => {
             Past reports
           </h2>
         </div>
+        {downloadError ? (
+          <p
+            role="alert"
+            className="mx-6 mt-4 rounded-lg bg-danger-light px-3 py-2 text-sm text-danger-dark"
+          >
+            {downloadError}
+          </p>
+        ) : null}
         <DataTable<Report>
           caption="Generated reports"
           rows={list}

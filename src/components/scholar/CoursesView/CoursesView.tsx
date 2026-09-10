@@ -4,6 +4,7 @@ import { GraduationCap, WifiOff } from "lucide-react";
 import { useScholarCourses, useConnectivity, useSocketEvents } from "@/hooks";
 import { queryKeys } from "@/hooks/keys";
 import { EmptyState, ErrorState } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { CourseCard } from "./CourseCard";
 
 export const CoursesView = () => {
@@ -38,7 +39,7 @@ export const CoursesView = () => {
       {!isOnline ? (
         <div
           role="status"
-          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. Progress may not be up to date.
@@ -52,9 +53,14 @@ export const CoursesView = () => {
           description="You haven't been enrolled in any courses yet. They'll appear here once your mentor adds them."
         />
       ) : (
-        <ul className="space-y-6">
-          {data?.map((course) => (
-            <li key={course.id}>
+        <ul className="space-y-5">
+          {data?.map((course, index) => (
+            <li
+              key={course.id}
+              className={`dash-enter ${
+                ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][index % 5]
+              }`}
+            >
               <CourseCard course={course} />
             </li>
           ))}
@@ -66,14 +72,11 @@ export const CoursesView = () => {
 
 function Header() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-        Courses &amp; Progress
-      </h1>
-      <p className="mt-1 text-neutral-600">
-        See how you&apos;re doing across each of your courses.
-      </p>
-    </div>
+    <ScholarPageHeader
+      eyebrow="Courses"
+      title="Courses &amp; Progress"
+      subtitle="See how you're doing across each of your courses."
+    />
   );
 }
 
@@ -85,13 +88,20 @@ function CoursesSkeleton() {
       aria-busy="true"
       aria-label="Loading courses"
     >
-      <div className="skeleton-shimmer h-8 w-52 rounded-lg" />
-      <div className="space-y-6">
+      <div className="space-y-2">
+        <div className="skeleton-shimmer h-3 w-28 rounded-md" />
+        <div className="skeleton-shimmer h-8 w-52 rounded-lg" />
+        <div className="skeleton-shimmer h-3 w-64 rounded-md" />
+      </div>
+      <div className="space-y-5">
         {[1, 2].map((i) => (
-          <div key={i} className="glass-card p-5">
+          <div
+            key={i}
+            className="glass-card rounded-2xl p-5"
+          >
             <div className="flex items-start justify-between gap-4">
               <div className="flex items-start gap-3">
-                <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+                <div className="skeleton-shimmer h-11 w-11 rounded-xl" />
                 <div className="space-y-2">
                   <div className="skeleton-shimmer h-4 w-40 rounded-md" />
                   <div className="skeleton-shimmer h-3 w-28 rounded-md" />
@@ -100,9 +110,9 @@ function CoursesSkeleton() {
               <div className="skeleton-shimmer h-9 w-16 rounded-md" />
             </div>
             <div className="skeleton-shimmer my-4 h-2.5 w-full rounded-full" />
-            <div className="grid grid-cols-2 gap-3 border-t border-white/40 pt-4">
-              <div className="skeleton-shimmer h-10 rounded-md" />
-              <div className="skeleton-shimmer h-10 rounded-md" />
+            <div className="grid grid-cols-2 gap-3 border-t border-white/40 pt-4 dark:border-white/5">
+              <div className="skeleton-shimmer h-12 rounded-xl" />
+              <div className="skeleton-shimmer h-12 rounded-xl" />
             </div>
           </div>
         ))}

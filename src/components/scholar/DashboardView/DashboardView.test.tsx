@@ -39,6 +39,7 @@ const mockAnalytics: DashboardAnalytics = {
 
 jest.mock("@/hooks/scholar", () => ({
   useScholarDashboard: jest.fn(),
+  useUpdateTaskStatus: jest.fn(),
 }));
 
 jest.mock("@/hooks/useSocketEvents", () => ({
@@ -50,12 +51,20 @@ jest.mock("@/hooks/useConnectivity", () => ({
 }));
 
 import { DashboardView } from "./DashboardView";
-import { useScholarDashboard } from "@/hooks/scholar";
+import { useScholarDashboard, useUpdateTaskStatus } from "@/hooks/scholar";
 import { useConnectivity } from "@/hooks/useConnectivity";
 
 const mockUseScholarDashboard = useScholarDashboard as jest.MockedFunction<
   typeof useScholarDashboard
 >;
+
+const mockUpdateTaskStatus = {
+  mutate: jest.fn(),
+  mutateAsync: jest.fn(),
+  isPending: false,
+  isError: false,
+  variables: undefined,
+};
 
 function queryResult(
   overrides: Partial<UseQueryResult<DashboardAnalytics, Error>>
@@ -96,6 +105,7 @@ function renderDashboard() {
 describe("DashboardView", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    (useUpdateTaskStatus as jest.Mock).mockReturnValue(mockUpdateTaskStatus);
   });
 
   it("shows skeleton while loading", () => {

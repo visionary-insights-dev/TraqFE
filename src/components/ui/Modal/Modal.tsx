@@ -50,24 +50,24 @@ export const Modal = ({
       {...props}
     >
       <div
-        className="absolute inset-0 bg-neutral-950/50"
+        className="absolute inset-0 bg-neutral-950/50 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden="true"
       />
       <div
         className={cn(
-          "relative z-10 flex max-h-[90vh] w-full flex-col rounded-lg bg-neutral-0 shadow-xl",
+          "glass-card glass-edge relative z-10 flex max-h-[90vh] w-full flex-col overflow-hidden rounded-2xl",
           sizeClass,
           className
         )}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-neutral-200 px-5 py-4">
+        <div className="flex items-start justify-between gap-4 border-b border-white/40 bg-gradient-to-br from-white/40 to-transparent px-5 py-4 dark:border-white/5">
           <div>
-            <h2 id="modal-title" className="text-lg font-semibold text-neutral-900">
+            <h2 id="modal-title" className="text-lg font-semibold text-neutral-900 dark:text-white">
               {title}
             </h2>
             {description ? (
-              <p id="modal-description" className="mt-0.5 text-sm text-neutral-500">
+              <p id="modal-description" className="mt-0.5 text-sm text-neutral-500 dark:text-slate-400">
                 {description}
               </p>
             ) : null}
@@ -76,7 +76,7 @@ export const Modal = ({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-neutral-500 transition-all duration-200 hover:bg-neutral-100 hover:text-neutral-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-95 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>

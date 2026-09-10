@@ -1,14 +1,26 @@
 import { useRef, type KeyboardEvent } from "react";
+import {
+  CheckCircle2,
+  CircleDot,
+  Clock,
+  LayoutGrid,
+  TriangleAlert,
+  type LucideIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { AssignmentFilter } from "../types";
 import type { StatusFilterBarProps } from "./types";
 
-export const FILTER_OPTIONS: { value: AssignmentFilter; label: string }[] = [
-  { value: "ALL", label: "All" },
-  { value: "PENDING", label: "Pending" },
-  { value: "AWAITING", label: "Awaiting" },
-  { value: "COMPLETED", label: "Completed" },
-  { value: "OVERDUE", label: "Overdue" },
+export const FILTER_OPTIONS: {
+  value: AssignmentFilter;
+  label: string;
+  icon: LucideIcon;
+}[] = [
+  { value: "ALL", label: "All", icon: LayoutGrid },
+  { value: "PENDING", label: "Pending", icon: CircleDot },
+  { value: "AWAITING", label: "Awaiting", icon: Clock },
+  { value: "COMPLETED", label: "Completed", icon: CheckCircle2 },
+  { value: "OVERDUE", label: "Overdue", icon: TriangleAlert },
 ];
 
 export const StatusFilterBar = ({
@@ -52,9 +64,9 @@ export const StatusFilterBar = ({
       ref={containerRef}
       role="tablist"
       aria-label="Filter assignments by status"
-      className="flex flex-wrap gap-2"
+      className="glass-surface flex flex-wrap gap-1 rounded-2xl p-1.5"
     >
-      {FILTER_OPTIONS.map(({ value, label }, index) => {
+      {FILTER_OPTIONS.map(({ value, label, icon: Icon }, index) => {
         const isActive = active === value;
         const count = counts[value] ?? 0;
         return (
@@ -68,18 +80,21 @@ export const StatusFilterBar = ({
             onKeyDown={(e) => handleKeyDown(e, index)}
             onClick={() => onChange(value)}
             className={cn(
-              "inline-flex h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-[0.97]",
+              "inline-flex h-11 items-center gap-1.5 rounded-xl px-3.5 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-[0.97]",
               isActive
-                ? "border-brand-700 bg-gradient-to-b from-brand-600 to-brand-700 text-white shadow-md"
-                : "border-transparent bg-white/70 text-neutral-600 hover:border-neutral-200 hover:bg-white hover:text-neutral-900"
+                ? "ember-glow bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-md shadow-amber-500/30"
+                : "text-neutral-600 hover:bg-white/70 hover:text-neutral-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
             )}
           >
+            <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
             {label}
             {count > 0 ? (
               <span
                 className={cn(
-                  "flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-xs font-semibold transition-colors duration-300",
-                  isActive ? "bg-white/25 text-white" : "bg-neutral-200 text-neutral-700"
+                  "flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-bold tabular-nums transition-colors duration-200",
+                  isActive
+                    ? "bg-white/25 text-amber-950"
+                    : "bg-white/70 text-neutral-700 dark:bg-white/10 dark:text-slate-300"
                 )}
               >
                 {count}

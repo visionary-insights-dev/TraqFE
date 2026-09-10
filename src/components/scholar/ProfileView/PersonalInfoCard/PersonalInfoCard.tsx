@@ -36,9 +36,13 @@ export const PersonalInfoCard = ({
     .toUpperCase();
 
   return (
-    <Card className="glass-card transition-all duration-300 ease-in-out hover:shadow-xl">
-      <CardContent className="space-y-5">
-        <h2 className="text-lg font-semibold text-neutral-900">
+    <Card className="glass-card glass-edge relative overflow-hidden rounded-2xl transition-all duration-300 ease-out hover:shadow-xl">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/15"
+      />
+      <CardContent className="relative space-y-5">
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-white">
           Personal Information
         </h2>
 
@@ -48,16 +52,20 @@ export const PersonalInfoCard = ({
             <img
               src={profile.avatarUrl}
               alt=""
-              className="h-16 w-16 rounded-full object-cover ring-2 ring-brand-100"
+              className="h-16 w-16 rounded-full object-cover ring-2 ring-amber-300/60 shadow-lg shadow-amber-500/20"
             />
           ) : (
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-brand-700 text-xl font-bold text-white shadow-md ring-4 ring-brand-100">
+            <div className="ember-glow flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-amber-500 text-xl font-bold text-amber-950 shadow-md shadow-amber-500/30 ring-4 ring-amber-200/50 dark:ring-amber-400/20">
               {initials}
             </div>
           )}
           <div>
-            <p className="font-medium text-neutral-900">{profile.name}</p>
-            <p className="text-sm text-neutral-600">{profile.email}</p>
+            <p className="font-medium text-neutral-900 dark:text-white">
+              {profile.name}
+            </p>
+            <p className="text-sm text-neutral-600 dark:text-slate-400">
+              {profile.email}
+            </p>
           </div>
         </div>
 

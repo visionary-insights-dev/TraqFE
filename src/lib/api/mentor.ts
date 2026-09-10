@@ -1,5 +1,4 @@
-import axios from "axios";
-import { get, post, patch } from "./client";
+import { apiClient, get, post, patch } from "./client";
 import {
   type AttendanceRosterInput,
   type AttendanceStatus,
@@ -118,7 +117,9 @@ export async function uploadResourceFile(
   uploadUrl: string,
   file: File
 ): Promise<void> {
-  await axios.put(uploadUrl, file, {
+  // Goes through apiClient so the Bearer token is attached, and the URL is
+  // relative to the /api/v1 base (as returned by the upload-url endpoint).
+  await apiClient.put(uploadUrl, file, {
     headers: { "Content-Type": file.type },
   });
 }

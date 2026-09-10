@@ -1,4 +1,39 @@
-import { db, success, error, requireUser, computeScholarStats, getSyllabus } from "@/lib/api/mock-db";
+import { db, success, error, requireUser, computeScholarStats, getSyllabus, getScholarTaskStatus } from "@/lib/api/mock-db";
+
+const ACTIVITY_DESCRIPTIONS: Record<
+  string,
+  (actor: string, label?: string) => string
+> = {
+  SCHOLAR_JOINED: (actor, label) => `${label ?? "A scholar"} joined the program`,
+  SCHOLAR_INVITED: (actor, label) => `${actor ?? "An admin"} invited ${label ?? "a new scholar"}`,
+  MENTOR_PAIRED: (actor, label) => `${actor ?? "A mentor"} was paired with ${label ?? "a scholar"}`,
+  ASSIGNMENT_PUBLISHED: (actor, label) => `${actor ?? "A mentor"} published ${label ?? "an assignment"}`,
+  ASSIGNMENT_SUBMITTED: (actor, label) => `${label ?? "A scholar"} submitted an assignment`,
+  ASSIGNMENT_VERIFIED: (actor, label) => `${actor ?? "A mentor"} verified ${label ?? "a submission"}`,
+  MEETING_SCHEDULED: (actor, label) => `${actor ?? "A mentor"} scheduled ${label ?? "a meeting"}`,
+  ATTENDANCE_UPDATED: (actor, label) => `Attendance was updated for ${label ?? "a meeting"}`,
+  COURSE_ARCHIVED: (actor, label) => `${label ?? "A course"} was archived`,
+  PROGRAM_ARCHIVED: (actor, label) => `${label ?? "A program"} was archived`,
+  REPORT_GENERATED: (actor, label) => `${actor ?? "An admin"} generated ${label ?? "a report"}`,
+  SETTINGS_UPDATED: (actor) => `${actor ?? "An admin"} updated organization settings`,
+};
+
+function activityItemFromAuditLog(
+  log: (typeof db.auditLogs)[number]
+): { id: string; type: string; actorName?: string; targetName?: string; description: string; at: string } {
+  const actor = log.actorName ?? "Someone";
+  const description = ACTIVITY_DESCRIPTIONS[log.eventType]
+    ? ACTIVITY_DESCRIPTIONS[log.eventType](actor, log.entityLabel ?? log.detail)
+    : log.detail ?? log.action;
+  return {
+    id: log.id,
+    type: log.eventType,
+    actorName: log.actorName,
+    targetName: log.entityLabel,
+    description,
+    at: log.at,
+  };
+}
 
 export async function GET(request: Request) {
   const user = await requireUser(request);
@@ -19,6 +54,10 @@ export async function GET(request: Request) {
       .filter((m) => !m.archived && new Date(m.startsAt) > new Date())
       .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime())[0];
 
+    const nextMeetingAttendeeCount = upcomingMeeting
+      ? db.attendance.filter((r) => r.meetingId === upcomingMeeting.id).length
+      : 0;
+
     const activeTasks = db.assignments
       .filter((a) => a.published)
       .map((a) => {
@@ -28,7 +67,7 @@ export async function GET(request: Request) {
           title: a.title,
           courseName: db.courses.find((c) => c.id === a.courseId)?.name,
           dueAt: a.dueAt,
-          status: sub?.status ?? a.status,
+          status: getScholarTaskStatus(user.sub as string, a.id, sub?.status ?? a.status),
         };
       })
       .filter((t) => !["VERIFIED", "VERIFIED_LATE"].includes(t.status))
@@ -53,6 +92,7 @@ export async function GET(request: Request) {
             startsAt: upcomingMeeting.startsAt,
             endsAt: upcomingMeeting.endsAt ?? upcomingMeeting.startsAt,
             courseName: db.courses.find((c) => c.id === upcomingMeeting.courseId)?.name,
+            attendeeCount: nextMeetingAttendeeCount,
             mentor: mentor
               ? { id: mentor.id, name: mentor.name, avatarUrl: mentor.avatarUrl }
               : undefined,
@@ -106,7 +146,10 @@ export async function GET(request: Request) {
       };
     });
 
-  const recentActivity = db.auditLogs.slice(-10).reverse();
+  const recentActivity = [...db.auditLogs]
+    .sort((a, b) => new Date(b.at).getTime() - new Date(a.at).getTime())
+    .slice(0, 10)
+    .map(activityItemFromAuditLog);
 
   return success({
     metrics: {

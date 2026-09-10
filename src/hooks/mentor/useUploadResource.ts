@@ -13,12 +13,14 @@ export type ResourceUploadVars =
       type: ResourceType;
       courseId?: string;
       url: string;
+      visibility?: "PUBLIC" | "PRIVATE";
     }
   | {
       name: string;
       type: ResourceType;
       courseId?: string;
       file: File;
+      visibility?: "PUBLIC" | "PRIVATE";
     };
 
 export function useUploadResource() {
@@ -32,6 +34,7 @@ export function useUploadResource() {
           type: vars.type,
           courseId: vars.courseId,
           url: vars.url,
+          visibility: vars.visibility,
         });
       }
       const { uploadUrl, fileKey } = await getResourceUploadUrl(
@@ -44,6 +47,7 @@ export function useUploadResource() {
         type: vars.type,
         courseId: vars.courseId,
         fileKey,
+        visibility: vars.visibility,
       });
     },
     onSuccess: (created: Resource) => {

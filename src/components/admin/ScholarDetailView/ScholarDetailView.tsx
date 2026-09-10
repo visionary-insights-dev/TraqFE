@@ -1,14 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import { ArrowLeft, Mail, Phone } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { AdminAvatar, ProgressRing } from "@/components/admin";
-import { Badge, ErrorState, LoadingSpinner } from "@/components/ui";
+import { Badge, Button, ErrorState, LoadingSpinner } from "@/components/ui";
 import { AssignmentStatusBadge, ProgressBar } from "@/components/scholar/shared";
-import { useAdminScholar } from "@/hooks";
+import { useAdminScholar, useAdminUpdateUserStatus } from "@/hooks";
 import { formatDate, formatDateTime, relativeTime } from "@/lib/utils";
-import type { AttendanceStatus, AuditLogEntry } from "@/lib/types";
+import type { AttendanceStatus, AuditLogEntry, PeopleStatus } from "@/lib/types";
 
 const ATTENDANCE_CONFIG: Record<
   AttendanceStatus,
@@ -29,9 +30,35 @@ const ATTENDANCE_PILLS: Array<{
   { key: "excused", label: "Excused", className: "bg-warning-light text-warning-dark" },
 ];
 
+const STATUS_CONFIG: Record<
+  PeopleStatus,
+  { label: string; variant: "green" | "amber" | "neutral" }
+> = {
+  ACTIVE: { label: "Active", variant: "green" },
+  INVITED: { label: "Invited", variant: "amber" },
+  SUSPENDED: { label: "Suspended", variant: "neutral" },
+};
+
 export const ScholarDetailView = () => {
   const params = useParams<{ id: string }>();
   const { data, isLoading, isError, refetch } = useAdminScholar(params.id);
+  const statusMutation = useAdminUpdateUserStatus();
+  const [statusError, setStatusError] = useState<string | null>(null);
+
+  const handleToggleStatus = async () => {
+    if (!data) return;
+    setStatusError(null);
+    const next: PeopleStatus = data.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE";
+    try {
+      await statusMutation.mutateAsync({ userId: data.id, status: next });
+    } catch (err) {
+      setStatusError(
+        err instanceof Error
+          ? err.message
+          : "Could not update the scholar's status."
+      );
+    }
+  };
 
   if (isLoading) {
     return (
@@ -77,7 +104,9 @@ export const ScholarDetailView = () => {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-neutral-900">{s.name}</h1>
-            <Badge variant="green">Active</Badge>
+            <Badge variant={STATUS_CONFIG[s.status].variant}>
+              {STATUS_CONFIG[s.status].label}
+            </Badge>
           </div>
           <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-neutral-500">
             <span className="inline-flex items-center gap-1.5">
@@ -92,6 +121,23 @@ export const ScholarDetailView = () => {
             ) : null}
             <span>Joined {formatDate(s.joinedAt)}</span>
           </div>
+        </div>
+        <div className="flex flex-col items-end gap-2">
+          {statusError ? (
+            <p role="alert" className="max-w-xs text-right text-xs font-medium text-danger-dark">
+              {statusError}
+            </p>
+          ) : null}
+          {s.status !== "INVITED" ? (
+            <Button
+              size="sm"
+              variant={s.status === "ACTIVE" ? "outline" : "primary"}
+              onClick={handleToggleStatus}
+              loading={statusMutation.isPending}
+            >
+              {s.status === "ACTIVE" ? "Suspend scholar" : "Reactivate scholar"}
+            </Button>
+          ) : null}
         </div>
       </div>
 

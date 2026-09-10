@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { FolderOpen, WifiOff } from "lucide-react";
 import { useScholarResources, useConnectivity } from "@/hooks";
 import { EmptyState, ErrorState } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { ResourceCard } from "./ResourceCard";
 import { ResourceFilters, type ResourceTypeFilter } from "./ResourceFilters";
 
@@ -53,7 +54,7 @@ export const ResourcesView = () => {
       {!isOnline ? (
         <div
           role="status"
-          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. Files may not be available to open.
@@ -96,8 +97,13 @@ export const ResourcesView = () => {
       ) : (
         <>
           <ul className="space-y-4">
-            {filtered.map((resource) => (
-              <li key={resource.id}>
+            {filtered.map((resource, index) => (
+              <li
+                key={resource.id}
+                className={`dash-enter ${
+                  ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][index % 5]
+                }`}
+              >
                 <ResourceCard resource={resource} />
               </li>
             ))}
@@ -113,14 +119,11 @@ export const ResourcesView = () => {
 
 function Header() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-        Resources
-      </h1>
-      <p className="mt-1 text-neutral-600">
-        Learning materials shared by your mentors.
-      </p>
-    </div>
+    <ScholarPageHeader
+      eyebrow="Resources"
+      title="Resources"
+      subtitle="Learning materials shared by your mentors."
+    />
   );
 }
 
@@ -132,15 +135,19 @@ function ResourcesSkeleton() {
       aria-busy="true"
       aria-label="Loading resources"
     >
-      <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+      <div className="space-y-2">
+        <div className="skeleton-shimmer h-3 w-28 rounded-md" />
+        <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+        <div className="skeleton-shimmer h-3 w-64 rounded-md" />
+      </div>
       <div className="skeleton-shimmer h-12 w-full rounded-xl" />
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex items-start gap-4 rounded-xl border border-white/40 bg-white/70 p-4 shadow-sm backdrop-blur"
+            className="glass-card flex items-start gap-4 rounded-2xl p-5"
           >
-            <div className="skeleton-shimmer h-11 w-11 rounded-lg" />
+            <div className="skeleton-shimmer h-11 w-11 rounded-xl" />
             <div className="flex-1 space-y-2">
               <div className="skeleton-shimmer h-4 w-3/4 rounded-md" />
               <div className="skeleton-shimmer h-3 w-1/2 rounded-md" />

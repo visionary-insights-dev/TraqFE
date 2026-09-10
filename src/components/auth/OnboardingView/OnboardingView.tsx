@@ -9,7 +9,7 @@ import {
   onboardingSchema,
   type OnboardingFormInput,
 } from "@/validators/auth";
-import { getProfileUploadUrl, uploadFileDirect } from "@/lib/api/auth";
+import { uploadProfileImage } from "@/lib/api/auth";
 import { Button, Input } from "@/components/ui";
 import { AuthCard, AuthErrorBanner } from "@/components/auth";
 import { ApiClientError } from "@/lib/api";
@@ -62,12 +62,8 @@ export const OnboardingView = () => {
     setPhotoPreview(URL.createObjectURL(file));
     setUploading(true);
     try {
-      const { uploadUrl, publicUrl } = await getProfileUploadUrl(
-        file.name,
-        file.type
-      );
-      await uploadFileDirect(uploadUrl, file);
-      setAvatarUrl(publicUrl);
+      const { url } = await uploadProfileImage(file);
+      setAvatarUrl(url);
     } catch {
       setUploadError("Unable to upload your photo. Please try again.");
     } finally {

@@ -105,6 +105,11 @@ export const MeetingsView = () => {
           {m.courseName ? (
             <p className="mt-0.5 text-xs text-neutral-500">{m.courseName}</p>
           ) : null}
+          {m.attendeeCount !== undefined ? (
+            <p className="mt-0.5 text-xs tabular-nums text-neutral-500">
+              {m.attendeeCount} attending
+            </p>
+          ) : null}
         </div>
       ),
     },

@@ -1,4 +1,4 @@
-import { render, screen } from "@/test-utils";
+import { renderWithProviders as render, screen } from "@/test-utils";
 import type { Assignment } from "@/lib/types";
 import { AssignmentCard } from "./index";
 

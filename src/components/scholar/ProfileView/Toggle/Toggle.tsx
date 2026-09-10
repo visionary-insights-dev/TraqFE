@@ -25,8 +25,10 @@ export const Toggle = ({
     >
       <span
         className={cn(
-          "relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300",
-          checked ? "bg-gradient-to-r from-brand-600 to-brand-700 shadow-inner" : "bg-neutral-500"
+          "relative inline-flex h-7 w-12 items-center rounded-full transition-all duration-300",
+          checked
+            ? "ember-glow bg-gradient-to-r from-amber-400 to-amber-500 shadow-inner shadow-amber-900/20 ring-2 ring-amber-400/40"
+            : "bg-neutral-500 ring-1 ring-black/10 dark:bg-slate-600"
         )}
       >
         <span

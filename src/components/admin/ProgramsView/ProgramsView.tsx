@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, WifiOff } from "lucide-react";
+import { Plus, RotateCcw, WifiOff } from "lucide-react";
 import Link from "next/link";
 import { AdminPageHeader, DataTable, type DataTableColumn } from "@/components/admin";
-import { ArchiveProgramModal } from "./ArchiveProgramModal";
+import { ArchiveProgramModal, UnarchiveProgramModal } from "./index";
 import { Badge, Button, ErrorState } from "@/components/ui";
-import { useArchiveProgram, useConnectivity, usePrograms } from "@/hooks";
+import { useArchiveProgram, useConnectivity, usePrograms, useUnarchiveProgram } from "@/hooks";
 import { formatDate } from "@/lib/utils";
 import type { Program } from "@/lib/types";
 
@@ -14,8 +14,11 @@ export const ProgramsView = () => {
   const isOnline = useConnectivity();
   const { data, isLoading, isError, refetch } = usePrograms();
   const archiveMutation = useArchiveProgram();
+  const unarchiveMutation = useUnarchiveProgram();
   const [archiveTarget, setArchiveTarget] = useState<Program | null>(null);
   const [archiveError, setArchiveError] = useState<string | null>(null);
+  const [unarchiveTarget, setUnarchiveTarget] = useState<Program | null>(null);
+  const [unarchiveError, setUnarchiveError] = useState<string | null>(null);
 
   const handleArchive = async () => {
     if (!archiveTarget) return;
@@ -26,6 +29,19 @@ export const ProgramsView = () => {
     } catch (err) {
       setArchiveError(
         err instanceof Error ? err.message : "Could not archive the program."
+      );
+    }
+  };
+
+  const handleUnarchive = async () => {
+    if (!unarchiveTarget) return;
+    setUnarchiveError(null);
+    try {
+      await unarchiveMutation.mutateAsync(unarchiveTarget.id);
+      setUnarchiveTarget(null);
+    } catch (err) {
+      setUnarchiveError(
+        err instanceof Error ? err.message : "Could not restore the program."
       );
     }
   };
@@ -130,7 +146,17 @@ export const ProgramsView = () => {
             Archive
           </button>
         ) : (
-          <span className="text-xs text-neutral-400">Archived</span>
+          <button
+            type="button"
+            onClick={() => {
+              setUnarchiveError(null);
+              setUnarchiveTarget(p);
+            }}
+            className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
+            <RotateCcw className="h-3.5 w-3.5" aria-hidden="true" />
+            Unarchive
+          </button>
         ),
     },
   ];
@@ -185,6 +211,15 @@ export const ProgramsView = () => {
         onConfirm={handleArchive}
         isSubmitting={archiveMutation.isPending}
         error={archiveError}
+      />
+
+      <UnarchiveProgramModal
+        program={unarchiveTarget}
+        open={unarchiveTarget !== null}
+        onClose={() => setUnarchiveTarget(null)}
+        onConfirm={handleUnarchive}
+        isSubmitting={unarchiveMutation.isPending}
+        error={unarchiveError}
       />
     </div>
   );

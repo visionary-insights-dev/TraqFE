@@ -1,4 +1,4 @@
-import { get, patch, post } from "./client";
+import { apiClient, get, patch, post } from "./client";
 import type { PaginatedResponse } from "./types";
 import type {
   AdminAssignment,
@@ -23,6 +23,7 @@ import type {
   MentorDetail,
   OrgSettings,
   OrgSettingsUpdateInput,
+  PeopleStatus,
   Program,
   ProgramInput,
   Report,
@@ -50,6 +51,10 @@ export function archiveProgram(programId: string): Promise<Program> {
   return post<Program>(`/programs/${programId}/archive`);
 }
 
+export function unarchiveProgram(programId: string): Promise<Program> {
+  return post<Program>(`/programs/${programId}/unarchive`);
+}
+
 export function getAdminCourses(): Promise<AdminCourse[]> {
   return get<AdminCourse[]>("/courses");
 }
@@ -69,6 +74,10 @@ export function archiveCourse(courseId: string): Promise<AdminCourse> {
   return post<AdminCourse>(`/courses/${courseId}/archive`);
 }
 
+export function unarchiveCourse(courseId: string): Promise<AdminCourse> {
+  return post<AdminCourse>(`/courses/${courseId}/unarchive`);
+}
+
 export function getAdminScholars(): Promise<AdminScholar[]> {
   return get<AdminScholar[]>("/users", { params: { role: "SCHOLAR" } });
 }
@@ -83,6 +92,19 @@ export function getAdminMentors(): Promise<AdminMentor[]> {
 
 export function getAdminMentor(id: string): Promise<MentorDetail> {
   return get<MentorDetail>(`/users/${id}`);
+}
+
+export function updateUserStatus(
+  userId: string,
+  status: PeopleStatus
+): Promise<{
+  id: string;
+  name: string;
+  email: string;
+  status: PeopleStatus;
+  mentorName?: string;
+}> {
+  return post(`/users/${userId}/status`, { status });
 }
 
 export function createMentorAssignment(
@@ -236,6 +258,22 @@ export function createReport(input: ReportInput): Promise<Report> {
 
 export function getReport(reportId: string): Promise<Report> {
   return get<Report>(`/reports/${reportId}`);
+}
+
+/**
+ * Downloads the generated report as a raw binary blob. Uses apiClient directly
+ * (bypassing the unwrap helper) because the 409/404 error paths return the
+ * standard error envelope instead of a data payload.
+ */
+export async function downloadReport(
+  reportId: string,
+  format: "csv" | "pdf"
+): Promise<Blob> {
+  const response = await apiClient.get<Blob>(`/reports/${reportId}/download`, {
+    params: { format },
+    responseType: "blob",
+  });
+  return response.data;
 }
 
 export function getOrgSettings(): Promise<OrgSettings> {

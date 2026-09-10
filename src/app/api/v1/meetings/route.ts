@@ -13,6 +13,7 @@ export async function GET(request: Request) {
         startsAt: m.startsAt,
         endsAt: m.endsAt,
         courseName: db.courses.find((c) => c.id === m.courseId)?.name,
+        attendeeCount: db.attendance.filter((r) => r.meetingId === m.id).length,
       }))
   );
 }

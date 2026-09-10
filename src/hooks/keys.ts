@@ -3,6 +3,7 @@ export const queryKeys = {
   scholarAssignments: (filters?: Record<string, unknown>) =>
     filters ? (["scholar", "assignments", filters] as const) : (["scholar", "assignments"] as const),
   scholarCourses: ["scholar", "courses"] as const,
+  scholarMeetings: ["scholar", "meetings"] as const,
   scholarResources: (filters?: Record<string, unknown>) =>
     filters ? (["scholar", "resources", filters] as const) : (["scholar", "resources"] as const),
   scholarCohort: ["scholar", "cohort"] as const,

@@ -27,6 +27,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       programName: db.programs[0]?.name,
       mentor: mentor ? { id: mentor.id, name: mentor.name } : null,
       joinedAt: "2026-01-20T10:00:00Z",
+      status: target.status,
       progress: {
         overall: stats.overall,
         assignmentPct: stats.assignmentPct,
@@ -85,7 +86,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           avatarUrl: s.avatarUrl,
           courseName: db.courses[0]?.name,
           programName: db.programs[0]?.name,
-          status: "ACTIVE" as const,
+          status: s.status,
           progress: { overall: st.overall, assignmentPct: st.assignmentPct, attendancePct: st.attendancePct },
           atRisk: st.atRisk,
           joinedAt: "2026-01-20T10:00:00Z",

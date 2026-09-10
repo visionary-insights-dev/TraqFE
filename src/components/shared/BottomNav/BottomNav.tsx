@@ -8,7 +8,7 @@ export const BottomNav = ({ items, className, ...props }: BottomNavProps) => {
     <nav
       aria-label="Mobile navigation"
       className={cn(
-        "fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200 bg-white pb-[env(safe-area-inset-bottom)]",
+        "glass-surface glass-edge fixed inset-x-0 bottom-0 z-40 border-t border-white/40 pb-[env(safe-area-inset-bottom)] dark:border-white/8",
         className
       )}
       {...props}
@@ -23,25 +23,47 @@ export const BottomNav = ({ items, className, ...props }: BottomNavProps) => {
                 aria-current={item.active ? "page" : undefined}
                 aria-label={item.ariaLabel ?? item.label}
                 className={cn(
-                  "flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+                  "relative flex min-h-[56px] flex-col items-center justify-center gap-1 px-1 text-xs font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-[0.96]",
                   item.active
-                    ? "text-brand-700"
-                    : "text-neutral-500 hover:text-neutral-800"
+                    ? "text-amber-600 dark:text-amber-400"
+                    : "text-neutral-500 hover:text-neutral-800 dark:text-slate-400 dark:hover:text-slate-200"
                 )}
               >
                 {Icon ? (
-                  <Icon
-                    className="h-6 w-6"
-                    strokeWidth={item.active ? 2.2 : 1.8}
-                    aria-hidden="true"
-                  />
+                  <span
+                    className={cn(
+                      "flex items-center justify-center rounded-full transition-all duration-200",
+                      item.active
+                        ? "ember-glow h-7 w-12 bg-gradient-to-b from-amber-400/25 to-amber-500/10"
+                        : "h-7 w-12 bg-transparent"
+                    )}
+                  >
+                    <Icon
+                      className="h-[22px] w-[22px]"
+                      strokeWidth={item.active ? 2.2 : 1.8}
+                      aria-hidden="true"
+                    />
+                  </span>
                 ) : null}
-                <span className="truncate">{item.label}</span>
+                <span
+                  className={cn(
+                    "truncate text-[11px]",
+                    item.active ? "font-semibold" : "font-medium"
+                  )}
+                >
+                  {item.label}
+                </span>
               </a>
             </li>
           );
         })}
       </ul>
+
+      {/* Safe-area breathing room + hairline light catcher */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent dark:via-white/10"
+      />
     </nav>
   );
 };

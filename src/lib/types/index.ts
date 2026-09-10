@@ -16,6 +16,10 @@ export const RESOURCE_TYPES = ["PDF", "LINK", "FILE", "VIDEO"] as const;
 
 export type ResourceType = (typeof RESOURCE_TYPES)[number];
 
+export const RESOURCE_VISIBILITIES = ["PUBLIC", "PRIVATE"] as const;
+
+export type ResourceVisibility = (typeof RESOURCE_VISIBILITIES)[number];
+
 export type AttendanceStatus = "PRESENT" | "ABSENT" | "EXCUSED";
 
 export interface Mentor {
@@ -40,6 +44,7 @@ export interface UpcomingMeeting {
   endsAt: string;
   courseName?: string;
   mentor?: Mentor;
+  attendeeCount?: number;
 }
 
 export interface ScholarTask {
@@ -88,6 +93,7 @@ export interface Resource {
   courseName?: string;
   uploadedAt: string;
   url?: string;
+  visibility?: ResourceVisibility;
 }
 
 export interface CohortMember {
@@ -114,6 +120,10 @@ export interface Assignment {
     id: string;
     submittedAt: string;
   };
+}
+
+export interface AssignmentStatusInput {
+  status: Extract<AssignmentStatus, "NOT_STARTED" | "IN_PROGRESS">;
 }
 
 export interface Conversation {
@@ -220,6 +230,7 @@ export interface Meeting {
   startsAt: string;
   endsAt?: string;
   courseName?: string;
+  attendeeCount?: number;
 }
 
 export interface MeetingInput {
@@ -255,6 +266,7 @@ export interface ResourceUploadInput {
   courseId?: string;
   url?: string;
   fileKey?: string;
+  visibility?: ResourceVisibility;
 }
 
 export interface MentorProfile {
@@ -337,7 +349,9 @@ export interface AdminCourse {
   code?: string;
   program: { id: string; name: string } | null;
   scholarCount?: number;
+  mentorId?: string;
   mentorName?: string;
+  archived?: boolean;
   createdAt: string;
 }
 
@@ -411,6 +425,7 @@ export interface ScholarDetail {
   assignments: AdminScholarAssignment[];
   meetings: AdminScholarMeeting[];
   auditTrail: AuditLogEntry[];
+  status: PeopleStatus;
 }
 
 export interface AdminMentor {

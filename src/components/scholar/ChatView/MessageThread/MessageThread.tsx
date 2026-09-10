@@ -28,7 +28,7 @@ export const MessageThread = ({
   }, [messages.length, currentUserId]);
 
   return (
-    <div className="flex h-full flex-col bg-white/50">
+    <div className="flex h-full flex-col bg-white/50 dark:bg-slate-950/40">
       <ThreadHeader name={conversationName} onBack={onBack} />
 
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
@@ -42,10 +42,14 @@ export const MessageThread = ({
             {[1, 2, 3].map((i) => (
               <div
                 key={i}
-                className={`skeleton-shimmer h-12 w-2/3 rounded-2xl ${
-                  i % 2 === 0 ? "ml-auto" : ""
-                }`}
-              />
+                className="glass-card h-12 w-2/3 overflow-hidden rounded-2xl"
+              >
+                <div
+                  className={`skeleton-shimmer h-full w-full ${
+                    i % 2 === 0 ? "ml-auto" : ""
+                  }`}
+                />
+              </div>
             ))}
           </div>
         ) : isError ? (
@@ -79,7 +83,7 @@ export const MessageThread = ({
       </div>
 
       {!online ? (
-        <p className="border-t border-white/40 bg-warning-light/80 px-4 py-2 text-sm font-medium text-warning-dark">
+        <p className="glass-surface border-t border-amber-200/60 bg-warning-light/90 px-4 py-2 text-sm font-medium text-warning-dark dark:border-amber-400/10 dark:text-amber-300">
           You&apos;re offline. Messages can&apos;t be sent right now.
         </p>
       ) : null}

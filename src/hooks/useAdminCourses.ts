@@ -3,6 +3,7 @@ import {
   archiveCourse,
   createCourse,
   getAdminCourses,
+  unarchiveCourse,
   updateCourse,
 } from "@/lib/api/admin";
 import type { CourseInput } from "@/lib/types";
@@ -41,6 +42,17 @@ export function useArchiveCourse() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (courseId: string) => archiveCourse(courseId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminCourses });
+      queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });
+    },
+  });
+}
+
+export function useUnarchiveCourse() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (courseId: string) => unarchiveCourse(courseId),
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.adminCourses });
       queryClient.invalidateQueries({ queryKey: queryKeys.adminDashboard });

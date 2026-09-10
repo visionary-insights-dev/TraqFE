@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { UploadCloud } from "lucide-react";
+import { Globe, Lock, UploadCloud } from "lucide-react";
 import { Button, Label, Modal } from "@/components/ui";
-import type { ResourceType } from "@/lib/types";
+import type { ResourceType, ResourceVisibility } from "@/lib/types";
 import { MAX_FILE_SIZE, type UploadResourceModalProps } from "./types";
 
 const TYPE_OPTIONS: Array<{ value: ResourceType; label: string }> = [
@@ -24,6 +24,7 @@ export const UploadResourceModal = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [type, setType] = useState<ResourceType>("PDF");
+  const [visibility, setVisibility] = useState<ResourceVisibility>("PUBLIC");
   const [courseId, setCourseId] = useState("");
   const [title, setTitle] = useState("");
   const [sizeError, setSizeError] = useState<string | null>(null);
@@ -68,6 +69,7 @@ export const UploadResourceModal = ({
         type,
         courseId: courseId || undefined,
         url: title.trim(),
+        visibility,
       });
     } else if (file) {
       await onUpload({
@@ -75,6 +77,7 @@ export const UploadResourceModal = ({
         type,
         courseId: courseId || undefined,
         file,
+        visibility,
       });
     }
   };
@@ -85,6 +88,7 @@ export const UploadResourceModal = ({
     setTitle("");
     setCourseId("");
     setType("PDF");
+    setVisibility("PUBLIC");
     setSizeError(null);
     onClose();
   };
@@ -192,6 +196,46 @@ export const UploadResourceModal = ({
             />
           </div>
         ) : null}
+
+        <div>
+          <Label htmlFor="upload-visibility">Visibility</Label>
+          <div
+            role="group"
+            aria-label="Resource visibility"
+            className="mt-1.5 grid grid-cols-2 gap-2"
+          >
+            <button
+              type="button"
+              aria-pressed={visibility === "PUBLIC"}
+              onClick={() => setVisibility("PUBLIC")}
+              className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                visibility === "PUBLIC"
+                  ? "border-brand-600 bg-brand-50 text-brand-800"
+                  : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
+              }`}
+            >
+              <Globe className="h-4 w-4" aria-hidden="true" />
+              Public
+            </button>
+            <button
+              type="button"
+              aria-pressed={visibility === "PRIVATE"}
+              onClick={() => setVisibility("PRIVATE")}
+              className={`inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                visibility === "PRIVATE"
+                  ? "border-brand-600 bg-brand-50 text-brand-800"
+                  : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
+              }`}
+            >
+              <Lock className="h-4 w-4" aria-hidden="true" />
+              Private
+            </button>
+          </div>
+          <p className="mt-1.5 text-xs text-neutral-500">
+            Public resources are visible to every scholar. Private ones are
+            only visible to you.
+          </p>
+        </div>
 
         <div>
           <Label htmlFor="upload-course">Course (optional)</Label>

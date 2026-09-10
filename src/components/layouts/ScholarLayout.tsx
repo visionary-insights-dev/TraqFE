@@ -44,7 +44,8 @@ export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
           />
         </div>
         <div className="flex flex-1 flex-col">
-          <header className="glass-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/40 px-4 shadow-sm lg:px-8">
+          <header className="glass-surface sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/40 px-4 shadow-sm dark:border-white/5 lg:px-8">
+            <div aria-hidden="true" className="pointer-events-none absolute inset-x-16 top-0 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent dark:via-white/10" />
             <div className="lg:hidden">
               <Brand />
             </div>
@@ -65,8 +66,8 @@ export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
 };
 
 const Brand = () => (
-  <span className="flex items-center gap-2.5 text-lg font-bold text-neutral-900">
-    <span className="brand-glow flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-700 text-sm font-bold text-white">
+  <span className="flex items-center gap-2.5 text-lg font-bold text-neutral-900 dark:text-white">
+    <span className="ember-glow flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-amber-400 via-amber-500 to-brand-600 text-sm font-bold text-white shadow-md shadow-amber-500/30">
       T
     </span>
     Traq

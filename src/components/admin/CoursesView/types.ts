@@ -18,3 +18,12 @@ export interface ArchiveCourseModalProps {
   isSubmitting: boolean;
   error: string | null;
 }
+
+export interface UnarchiveCourseModalProps {
+  course: AdminCourse | null;
+  open: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  isSubmitting: boolean;
+  error: string | null;
+}

@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { WifiOff, CheckCircle2 } from "lucide-react";
 import { useScholarProfile, useUpdateProfile, useConnectivity } from "@/hooks";
 import { ErrorState, LoadingSpinner } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { PersonalInfoCard } from "./PersonalInfoCard";
 import { NotificationPrefs } from "./NotificationPrefs";
 import { AccountSecurity } from "./AccountSecurity";
@@ -40,17 +41,16 @@ export const ProfileView = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900">Profile &amp; Settings</h1>
-        <p className="mt-1 text-neutral-600">
-          Manage your personal details and preferences.
-        </p>
-      </div>
+      <ScholarPageHeader
+        eyebrow="Profile"
+        title="Profile & Settings"
+        subtitle="Manage your personal details and preferences."
+      />
 
       {!online ? (
         <div
           role="status"
-          className="glass-surface mb-4 flex items-center gap-2 rounded-xl border-warning px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. Changes can&apos;t be saved until you reconnect.
@@ -106,7 +106,7 @@ const ProfileForm = ({ profile, disabled }: ProfileFormProps) => {
       {saved ? (
         <p
           role="status"
-          className="inline-flex items-center gap-2 rounded-full bg-success-light px-4 py-2 text-sm font-semibold text-success-dark shadow-sm"
+          className="glass-surface inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold text-success-dark shadow-md dark:text-green-300"
         >
           <CheckCircle2 className="h-4 w-4 shrink-0" aria-hidden="true" />
           Changes saved.

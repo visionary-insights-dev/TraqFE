@@ -1,4 +1,4 @@
-import { db, success, error, requireUser, computeScholarStats } from "@/lib/api/mock-db";
+import { db, success, error, requireUser, computeScholarStats, getScholarTaskStatus } from "@/lib/api/mock-db";
 
 export async function GET(request: Request) {
   const user = await requireUser(request);
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
             title: a.title,
             courseName: c.name,
             dueAt: a.dueAt,
-            status: sub?.status ?? a.status,
+            status: getScholarTaskStatus(user.sub as string, a.id, sub?.status ?? a.status),
           };
         }),
       };

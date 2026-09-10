@@ -11,6 +11,7 @@ import {
 } from "@/hooks";
 import { queryKeys } from "@/hooks/keys";
 import { EmptyState, ErrorState } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { AssignmentCard } from "./AssignmentCard";
 import { StatusFilterBar } from "./StatusFilterBar";
 import { AssignmentDetail } from "./AssignmentDetail";
@@ -104,7 +105,7 @@ export const AssignmentsView = () => {
       {!isOnline ? (
         <div
           role="status"
-          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. You can&apos;t submit assignments until you
@@ -135,8 +136,13 @@ export const AssignmentsView = () => {
       ) : (
         <>
           <ul className="space-y-4">
-            {filtered.map((assignment) => (
-              <li key={assignment.id}>
+            {filtered.map((assignment, index) => (
+              <li
+                key={assignment.id}
+                className={`dash-enter ${
+                  ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][index % 5]
+                }`}
+              >
                 <AssignmentCard
                   assignment={assignment}
                   onOpen={() => setDetailId(assignment.id)}
@@ -169,14 +175,11 @@ export const AssignmentsView = () => {
 
 function Header() {
   return (
-    <div>
-      <h1 className="text-2xl font-bold tracking-tight text-neutral-900">
-        Assignments
-      </h1>
-      <p className="mt-1 text-neutral-600">
-        Track and complete your assigned work.
-      </p>
-    </div>
+    <ScholarPageHeader
+      eyebrow="Assignments"
+      title="Assignments"
+      subtitle="Track and complete your assigned work."
+    />
   );
 }
 
@@ -188,7 +191,11 @@ function AssignmentsSkeleton() {
       aria-busy="true"
       aria-label="Loading assignments"
     >
-      <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+      <div className="space-y-2">
+        <div className="skeleton-shimmer h-3 w-28 rounded-md" />
+        <div className="skeleton-shimmer h-8 w-44 rounded-lg" />
+        <div className="skeleton-shimmer h-3 w-64 rounded-md" />
+      </div>
       <div className="flex flex-wrap gap-2">
         {["All", "Pending", "Awaiting", "Completed", "Overdue"].map((label) => (
           <div
@@ -199,9 +206,9 @@ function AssignmentsSkeleton() {
       </div>
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="glass-card p-5">
+          <div key={i} className="glass-card rounded-2xl p-5">
             <div className="flex items-center gap-4">
-              <div className="skeleton-shimmer h-10 w-10 rounded-lg" />
+              <div className="skeleton-shimmer h-11 w-11 rounded-xl" />
               <div className="flex-1 space-y-2">
                 <div className="skeleton-shimmer h-4 w-1/2 rounded-md" />
                 <div className="skeleton-shimmer h-3 w-2/3 rounded-md" />
