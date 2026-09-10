@@ -1,4 +1,6 @@
-import { forwardRef } from "react";
+"use client";
+
+import { forwardRef, useEffect, useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "../Label";
@@ -21,6 +23,16 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
     const inputId = id;
     const errorId = error && inputId ? `${inputId}-error` : undefined;
 
+    // The decorative <Check> icon must be suppressed during SSR and the
+    // client's very first paint so the server-rendered HTML matches
+    // hydration exactly. Without this guard, a mismatch occurs when the
+    // parent resolves `checked` to a different value on the client (e.g.
+    // react-hook-form defaults, async state) than the server saw.
+    const [hasMounted, setHasMounted] = useState(false);
+    useEffect(() => {
+      setHasMounted(true);
+    }, []);
+
     return (
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2.5">
@@ -39,7 +51,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
               )}
               {...props}
             />
-            {checked ? (
+            {hasMounted && checked ? (
               <span
                 aria-hidden="true"
                 className="pointer-events-none absolute left-1/2 top-1/2 flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center text-brand-600"

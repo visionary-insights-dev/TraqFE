@@ -46,15 +46,21 @@ function isRefreshRequest(url?: string): boolean {
 
 function redirectToSignIn(): void {
   if (typeof window !== "undefined") {
-    window.location.assign("/auth/sign-in");
+    // Full page reload is intentional: the refresh token is expired so all
+    // client state (React tree, in-memory auth store) must be discarded.
+    // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+    window.location.href = "/auth/sign-in";
   }
 }
 
 /**
  * Exchanges the httpOnly `refresh_token` cookie for a new access token. A
  * single shared promise deduplicates concurrent 401s so the browser only ever
- * calls /auth/refresh once per batch. On failure the session is cleared and the
- * user is bounced to sign-in.
+ * calls /auth/refresh once per batch. On failure the rejected promise is
+ * forwarded to the caller — clearing the session is the responsibility of each
+ * calling context (the 401 interceptor clears auth + redirects; the onboarding
+ * flow deliberately keeps the in-memory user so the success screen can still
+ * navigate).
  */
 export function refreshAccessToken(): Promise<void> {
   if (!refreshPromise) {
@@ -66,11 +72,6 @@ export function refreshAccessToken(): Promise<void> {
       )
       .then((response) => {
         setAccessToken(response.data.data.accessToken);
-      })
-      .catch((error: unknown) => {
-        clearAuth();
-        redirectToSignIn();
-        throw error;
       })
       .finally(() => {
         refreshPromise = null;
@@ -97,7 +98,11 @@ apiClient.interceptors.response.use(
         await refreshAccessToken();
         return apiClient(config);
       } catch (refreshError) {
-        // Auth was cleared and the user redirected by refreshAccessToken.
+        // Refresh failed — the refresh cookie is no longer valid, so expire
+        // the in-memory session and do a full reload to sign-in (a full
+        // reload discards the React tree, which can hold stale protected data).
+        clearAuth();
+        redirectToSignIn();
         return Promise.reject(refreshError);
       }
     }

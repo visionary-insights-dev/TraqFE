@@ -146,4 +146,34 @@ describe("middleware role guards", () => {
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
+
+  // An incomplete-profile user visiting the auth screens is allowed through so
+  // they can reach /auth/sign-in (sign out, switch accounts) — they must not
+  // be trapped in a redirect to onboarding.
+  it("allows an incomplete-profile user through /auth/sign-in (no onboarding trap)", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
+    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
+    expect(response).toMatchObject({ kind: "next" });
+  });
+
+  // The root is always the public landing page — an incomplete session must
+  // never hijack it into onboarding.
+  it("serves the public landing page at / for an incomplete-profile session", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
+    const response = await routeRequest(makeRequest("/", "token"), verify);
+    expect(response).toMatchObject({ kind: "next" });
+  });
+
+  // The root stays public even for a fully onboarded user.
+  it("serves the public landing page at / for a complete-profile session", async () => {
+    const verify = jest
+      .fn()
+      .mockResolvedValue({ role: "SCHOLAR", profileComplete: true });
+    const response = await routeRequest(makeRequest("/", "token"), verify);
+    expect(response).toMatchObject({ kind: "next" });
+  });
 });
