@@ -1,0 +1,8 @@
+# Netlify build configuration — Next.js (App Router) is auto-detected and
+# built with the OpenNext adapter, so no publish dir / plugin pinning is needed.
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NEXT_PUBLIC_APP_ENV = "production"

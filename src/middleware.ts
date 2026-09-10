@@ -129,17 +129,13 @@ export async function routeRequest(
   }
 
   if (config.redirectAuthed && isAuthenticated && payload?.role) {
-    // Don't bounce already-authenticated users off onboarding/success if
-    // their profile isn't complete yet.
-    const isOnboardingRoute =
-      pathname === "/auth/onboarding" ||
-      pathname === "/auth/onboarding/success";
-    if (payload.profileComplete === false && !isOnboardingRoute) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/onboarding";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
+    // Auth screens must never trap an incomplete-profile user in an onboarding
+    // loop: someone holding a valid refresh cookie but without a completed
+    // profile still needs to reach /auth/sign-in to sign out or switch
+    // accounts. Only complete-profile users are bounced from the auth area to
+    // their role home; incomplete profiles are still funneled into onboarding
+    // by the requireAuth guard below when they try to reach a protected role
+    // page.
     const home = ROLE_HOME[payload.role];
     if (home && payload.profileComplete !== false) {
       const url = request.nextUrl.clone();

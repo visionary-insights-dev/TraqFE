@@ -1,21 +1,29 @@
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { logout } from "@/lib/api/auth";
 import { disconnectSocket } from "@/lib/api/socket";
 import { clearAccessToken, clearUser } from "@/stores/auth";
 
 export function useLogout() {
-  const router = useRouter();
-
   return useMutation({
-    mutationFn: () => logout(),
-    // Clear local session and bounce to sign-in even if the server call fails
-    // (the token is already dead or the network is down).
+    mutationFn: async () => {
+      // Ask the server to invalidate the httpOnly `refresh_token` cookie first
+      // (Set-Cookie Max-Age=0 on the mock backend). Local state is cleared
+      // even if the call fails so no in-memory session survives.
+      try {
+        await logout();
+      } finally {
+        disconnectSocket();
+        clearAccessToken();
+        clearUser();
+      }
+    },
+    // Full page navigation (not router.replace) so middleware re-runs against
+    // the now-cleared cookie. A client-side navigation skips middleware and
+    // could leave a still-valid refresh_token "alive" on the next page reload.
     onSettled: () => {
-      disconnectSocket();
-      clearAccessToken();
-      clearUser();
-      router.replace("/auth/sign-in");
+      window.location.assign(
+        new URL("/auth/sign-in", window.location.origin).toString()
+      );
     },
   });
 }

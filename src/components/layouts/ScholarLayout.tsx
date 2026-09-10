@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Sidebar } from "@/components/shared/Sidebar";
 import { BottomNav } from "@/components/shared/BottomNav";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { WebSocketProvider } from "@/components/shared/Providers";
 import type { NavItem } from "@/components/shared/Sidebar/types";
 import type { BottomNavItem } from "@/components/shared/BottomNav/types";
@@ -48,7 +49,7 @@ export const ScholarLayout = ({ children }: ScholarLayoutProps) => {
               <Brand />
             </div>
             <div className="ml-auto flex items-center gap-4">
-              <Avatar />
+              <UserMenu />
             </div>
           </header>
           <main className="flex-1 px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:pb-8">
@@ -70,10 +71,4 @@ const Brand = () => (
     </span>
     Traq
   </span>
-);
-
-const Avatar = () => (
-  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-100 to-brand-200 text-sm font-semibold text-brand-800 ring-1 ring-brand-200">
-    ?
-  </div>
 );

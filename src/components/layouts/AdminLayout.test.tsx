@@ -1,10 +1,10 @@
 // src/components/layouts/AdminLayout.test.tsx
-import { render, screen } from "@/test-utils";
+import { renderWithProviders, screen } from "@/test-utils";
 import { AdminLayout } from "./index";
 
 describe("AdminLayout", () => {
   it("renders admin navigation items including management destinations", () => {
-    render(
+    renderWithProviders(
       <AdminLayout>
         <p>Admin content</p>
       </AdminLayout>
@@ -31,7 +31,7 @@ describe("AdminLayout", () => {
   // Admin is desktop-first with high information density; all management
   // section links must be reachable as navigation.
   it("renders all core admin management links", () => {
-    render(
+    renderWithProviders(
       <AdminLayout>
         <p>Admin content</p>
       </AdminLayout>
@@ -57,7 +57,7 @@ describe("AdminLayout", () => {
   });
 
   it("renders its children", () => {
-    render(
+    renderWithProviders(
       <AdminLayout>
         <p>Admin dashboard content</p>
       </AdminLayout>

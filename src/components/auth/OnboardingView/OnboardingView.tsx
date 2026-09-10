@@ -76,10 +76,11 @@ export const OnboardingView = () => {
   };
 
   const onSubmit = (values: OnboardingFormInput) => {
+    setUploadError(null);
     onboardingMutation.mutate(
       {
         name: values.name,
-        phone: values.phone || undefined,
+        phone: values.phone?.trim() || undefined,
         avatarUrl,
       },
       { onSuccess: () => router.push("/auth/onboarding/success") }

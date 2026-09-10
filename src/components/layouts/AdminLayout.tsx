@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/shared/Sidebar";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { cn } from "@/lib/utils";
 import type { NavItem } from "@/components/shared/Sidebar/types";
 import type { AdminLayoutProps } from "./types";
@@ -54,7 +55,7 @@ export const AdminLayout = ({ children }: AdminLayoutProps) => {
             <span className="h-1.5 w-1.5 rounded-full bg-brand-600" aria-hidden="true" />
             <span className="font-medium">Workspace overview</span>
           </div>
-          <HeaderActions />
+          <UserMenu />
         </header>
         <main className={cn("flex-1 px-6 py-6 lg:px-8")}>{children}</main>
       </div>
@@ -72,19 +73,4 @@ const Brand = () => (
       Admin
     </span>
   </span>
-);
-
-const HeaderActions = () => (
-  <div className="flex items-center gap-2">
-    <div className="hidden text-right sm:block">
-      <p className="text-sm font-semibold leading-tight text-neutral-900">Admin</p>
-      <p className="text-xs text-neutral-500">Super Admin</p>
-    </div>
-    <div
-      className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-secondary-500 text-sm font-semibold text-white shadow-sm"
-      aria-hidden="true"
-    >
-      A
-    </div>
-  </div>
 );

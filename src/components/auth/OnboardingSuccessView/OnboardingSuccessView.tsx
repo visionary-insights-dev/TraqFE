@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { getUser } from "@/stores/auth";
 import { Button } from "@/components/ui";
 import { AuthCard } from "@/components/auth";
@@ -13,12 +12,14 @@ const roleHome: Record<string, string> = {
 };
 
 export const OnboardingSuccessView = () => {
-  const router = useRouter();
-
   const goToDashboard = () => {
     const user = getUser();
     const dest = user?.role ? roleHome[user.role] : "/";
-    router.push(dest);
+    // Use a full page reload so the middleware re-evaluates the (now
+    // refreshed) JWT cookie. A soft navigation via router.push can
+    // sometimes resolve before the cookie is flushed, causing the
+    // middleware to still see the old profileComplete:false claim.
+    window.location.href = dest;
   };
 
   return (

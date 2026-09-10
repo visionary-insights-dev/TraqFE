@@ -155,12 +155,39 @@ describe("api client", () => {
       );
     });
 
-    it("clears auth and rejects on refresh failure", async () => {
+    // refreshAccessToken is context-free: it must forward the failure without
+    // touching in-memory auth. Around onboarding the caller deliberately keeps
+    // the in-memory user so the success screen can still navigate; the session
+    // teardown lives in the 401 interceptor instead.
+    it("rejects on refresh failure without clearing in-memory auth", async () => {
       setAccessToken("expired-token");
       const { refreshAccessToken } = await import("./index");
       axiosPost.mockRejectedValueOnce({ response: { status: 401 } });
 
       await expect(refreshAccessToken()).rejects.toBeTruthy();
+      const { getAccessToken } = await import("@/stores/auth");
+      expect(getAccessToken()).toBe("expired-token");
+    });
+
+    it("clears auth when a 401 refresh fails", async () => {
+      setAccessToken("expired-token");
+
+      axiosPost.mockRejectedValueOnce({ response: { status: 401 } });
+
+      const handlers = apiClient.interceptors.response
+        .handlers as unknown as Array<{
+        rejected?: (error: unknown) => Promise<unknown>;
+      }>;
+      const rejected = handlers.find((handler) => handler.rejected)?.rejected;
+      expect(rejected).toBeDefined();
+
+      // Non-axios-shaped error is fine — the interceptor reacts to status 401.
+      await expect(
+        rejected!({ response: { status: 401 }, config: {} })
+      ).rejects.toBeTruthy();
+
+      // The session is torn down here (this is the only context that clears
+      // auth on refresh failure — refreshAccessToken itself is context-free).
       const { getAccessToken } = await import("@/stores/auth");
       expect(getAccessToken()).toBeNull();
     });
