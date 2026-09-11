@@ -1,10 +1,13 @@
 import {
   CalendarPlus,
   CheckCircle2,
+  ClipboardCheck,
+  FileDown,
   FileText,
   FolderArchive,
   Link2,
   Mail,
+  Send,
   Settings2,
   UserPlus,
   type LucideIcon,
@@ -17,9 +20,13 @@ const ICONS: Record<string, LucideIcon> = {
   SCHOLAR_INVITED: Mail,
   MENTOR_PAIRED: Link2,
   ASSIGNMENT_PUBLISHED: FileText,
+  ASSIGNMENT_SUBMITTED: Send,
   ASSIGNMENT_VERIFIED: CheckCircle2,
   MEETING_SCHEDULED: CalendarPlus,
+  ATTENDANCE_UPDATED: ClipboardCheck,
+  COURSE_ARCHIVED: FolderArchive,
   PROGRAM_ARCHIVED: FolderArchive,
+  REPORT_GENERATED: FileDown,
   SETTINGS_UPDATED: Settings2,
 };
 
@@ -28,9 +35,13 @@ const SIGNATURE: Partial<Record<string, string>> = {
   SCHOLAR_INVITED: "bg-info-light text-info-dark",
   MENTOR_PAIRED: "bg-brand-100 text-brand-700",
   ASSIGNMENT_PUBLISHED: "bg-brand-100 text-brand-700",
+  ASSIGNMENT_SUBMITTED: "bg-success-light text-success-dark",
   ASSIGNMENT_VERIFIED: "bg-success-light text-success-dark",
   MEETING_SCHEDULED: "bg-warning-light text-warning-dark",
+  ATTENDANCE_UPDATED: "bg-warning-light text-warning-dark",
+  COURSE_ARCHIVED: "bg-neutral-200 text-neutral-700",
   PROGRAM_ARCHIVED: "bg-neutral-200 text-neutral-700",
+  REPORT_GENERATED: "bg-info-light text-info-dark",
   SETTINGS_UPDATED: "bg-neutral-100 text-neutral-600",
 };
 

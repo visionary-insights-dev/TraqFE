@@ -1,10 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Users, WifiOff, Search, X } from "lucide-react";
+import { GraduationCap, Search, UserRound, Users, WifiOff, X } from "lucide-react";
 import { useScholarCohort, useConnectivity } from "@/hooks";
 import type { CohortMember } from "@/lib/types";
 import { EmptyState, ErrorState } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { MemberRow } from "./MemberRow";
 
 export const CohortView = () => {
@@ -55,7 +56,7 @@ export const CohortView = () => {
       {!isOnline ? (
         <div
           role="status"
-          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. Member details may be out of date.
@@ -117,13 +118,24 @@ export const CohortView = () => {
                 <section aria-labelledby="mentors-heading">
                   <h2
                     id="mentors-heading"
-                    className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-600"
+                    className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-neutral-600 dark:text-slate-400"
                   >
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-amber-100 text-amber-700 dark:bg-amber-400/20 dark:text-amber-300">
+                      <GraduationCap className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
                     Mentors
                   </h2>
                   <ul className="space-y-3">
-                    {members.mentors.map((member) => (
-                      <MemberRow key={member.id} member={member} />
+                    {members.mentors.map((member, index) => (
+                      <MemberRow
+                        key={member.id}
+                        member={member}
+                        className={`dash-enter ${
+                          ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][
+                            index % 5
+                          ]
+                        }`}
+                      />
                     ))}
                   </ul>
                 </section>
@@ -133,13 +145,24 @@ export const CohortView = () => {
                 <section aria-labelledby="scholars-heading">
                   <h2
                     id="scholars-heading"
-                    className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-600"
+                    className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-neutral-600 dark:text-slate-400"
                   >
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-brand-100 text-brand-700 dark:bg-brand-500/20 dark:text-brand-300">
+                      <UserRound className="h-3.5 w-3.5" aria-hidden="true" />
+                    </span>
                     Scholars
                   </h2>
                   <ul className="space-y-3">
-                    {members.scholars.map((member) => (
-                      <MemberRow key={member.id} member={member} />
+                    {members.scholars.map((member, index) => (
+                      <MemberRow
+                        key={member.id}
+                        member={member}
+                        className={`dash-enter ${
+                          ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][
+                            index % 5
+                          ]
+                        }`}
+                      />
                     ))}
                   </ul>
                 </section>
@@ -154,14 +177,14 @@ export const CohortView = () => {
 
 function Header({ name, memberCount }: { name?: string; memberCount: number }) {
   return (
-    <div className="flex flex-wrap items-baseline justify-between gap-2">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-900">My Cohort</h1>
-        {name ? (
-          <p className="mt-1 text-neutral-600">{name}</p>
-        ) : null}
-      </div>
-      <p className="text-sm text-neutral-600">
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <ScholarPageHeader
+        eyebrow="Cohort"
+        title="My Cohort"
+        subtitle={name}
+      />
+      <p className="glass-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-neutral-700 dark:text-slate-200">
+        <Users className="h-4 w-4 text-amber-500" aria-hidden="true" />
         {memberCount} member{memberCount === 1 ? "" : "s"}
       </p>
     </div>
@@ -176,15 +199,18 @@ function CohortSkeleton() {
       aria-busy="true"
       aria-label="Loading cohort"
     >
-      <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+      <div className="space-y-2">
+        <div className="skeleton-shimmer h-3 w-24 rounded-md" />
+        <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+      </div>
       <div className="skeleton-shimmer h-12 w-full rounded-xl" />
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className="flex items-center gap-4 rounded-xl border border-white/40 bg-white/70 p-4 shadow-sm"
+            className="glass-card flex items-center gap-4 rounded-2xl p-4"
           >
-            <div className="skeleton-shimmer h-11 w-11 rounded-full" />
+            <div className="skeleton-shimmer h-12 w-12 rounded-full" />
             <div className="flex-1 space-y-2">
               <div className="skeleton-shimmer h-4 w-2/3 rounded-md" />
               <div className="skeleton-shimmer h-3 w-1/3 rounded-md" />

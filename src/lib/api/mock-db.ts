@@ -69,6 +69,7 @@ import type {
   AssignmentStatus,
   AttendanceStatus,
   InvitationStatus,
+  PeopleStatus,
   ProgramStatus,
   ReportStatus,
   ImportStatus,
@@ -85,6 +86,7 @@ export interface MockUser {
   profileComplete: boolean;
   phone: string;
   title?: string;
+  status: PeopleStatus;
   password: string;
 }
 
@@ -148,6 +150,7 @@ export interface MockCourse {
   name: string;
   code?: string;
   programId?: string;
+  archived: boolean;
   createdAt: string;
 }
 
@@ -175,6 +178,7 @@ export interface MockResource {
   uploadedAt: string;
   url: string;
   uploadedBy: string;
+  visibility: "PUBLIC" | "PRIVATE";
 }
 
 export interface MockReport {
@@ -224,6 +228,7 @@ export const db = {
       avatarUrl: "",
       profileComplete: true,
       phone: "+234-800-000-0001",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
     {
@@ -236,6 +241,7 @@ export const db = {
       profileComplete: true,
       phone: "+234-800-000-0002",
       title: "Senior Mentor",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
     {
@@ -247,6 +253,7 @@ export const db = {
       avatarUrl: "",
       profileComplete: false,
       phone: "+234-800-000-0003",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
     {
@@ -258,6 +265,7 @@ export const db = {
       avatarUrl: "",
       profileComplete: true,
       phone: "+234-800-000-0004",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
     {
@@ -269,6 +277,7 @@ export const db = {
       avatarUrl: "",
       profileComplete: true,
       phone: "+234-800-000-0005",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
     {
@@ -281,6 +290,7 @@ export const db = {
       profileComplete: true,
       phone: "+234-800-000-0006",
       title: "Course Mentor",
+      status: "ACTIVE" as PeopleStatus,
       password: "password123",
     },
   ] as MockUser[],
@@ -312,6 +322,7 @@ export const db = {
       name: "Intro to Web Development",
       code: "WEB101",
       programId: "prog-001",
+      archived: false,
       createdAt: "2026-01-12T10:00:00Z",
     },
     {
@@ -319,6 +330,7 @@ export const db = {
       name: "Data Structures",
       code: "DS201",
       programId: "prog-001",
+      archived: false,
       createdAt: "2026-01-12T10:00:00Z",
     },
     {
@@ -326,6 +338,7 @@ export const db = {
       name: "Soft Skills Workshop",
       code: "SS101",
       programId: "prog-002",
+      archived: false,
       createdAt: "2026-02-22T10:00:00Z",
     },
   ],
@@ -472,6 +485,7 @@ export const db = {
       uploadedAt: "2026-09-01T10:00:00Z",
       url: "https://storage.scholarlink.dev/resources/html-cheat.pdf",
       uploadedBy: "usr-mentor-01",
+      visibility: "PUBLIC",
     },
     {
       id: "res-002",
@@ -481,6 +495,7 @@ export const db = {
       uploadedAt: "2026-09-02T10:00:00Z",
       url: "https://css-tricks.com/snippets/css/a-guide-to-flexbox/",
       uploadedBy: "usr-mentor-01",
+      visibility: "PUBLIC",
     },
     {
       id: "res-003",
@@ -490,6 +505,7 @@ export const db = {
       uploadedAt: "2026-09-10T10:00:00Z",
       url: "https://storage.scholarlink.dev/resources/leadership.mp4",
       uploadedBy: "usr-mentor-02",
+      visibility: "PRIVATE",
     },
   ] as MockResource[],
 
@@ -520,14 +536,22 @@ export const db = {
     const events = [
       "SCHOLAR_JOINED", "MENTOR_PAIRED", "ASSIGNMENT_PUBLISHED",
       "ASSIGNMENT_SUBMITTED", "ASSIGNMENT_VERIFIED", "MEETING_SCHEDULED",
-      "ATTENDANCE_UPDATED", "SETTINGS_UPDATED",
+      "ATTENDANCE_UPDATED", "SETTINGS_UPDATED", "SCHOLAR_INVITED",
+      "PROGRAM_ARCHIVED", "COURSE_ARCHIVED", "REPORT_GENERATED",
     ];
+    const entityTypes: Record<string, string> = {
+      SCHOLAR_JOINED: "USER",
+      SCHOLAR_INVITED: "INVITATION",
+      PROGRAM_ARCHIVED: "PROGRAM",
+      COURSE_ARCHIVED: "COURSE",
+      REPORT_GENERATED: "REPORT",
+    };
     for (let i = 0; i < 50; i++) {
       const evt = events[i % events.length];
       const actors = ["Admin User", "Mentor User", "Chi Nwosu"];
       logs.push({
         id: `audit-${String(i + 1).padStart(3, "0")}`,
-        entityType: evt.includes("ASSIGNMENT") ? "assignment" : evt.includes("MEETING") ? "meeting" : "user",
+        entityType: entityTypes[evt] ?? (evt.includes("ASSIGNMENT") ? "ASSIGNMENT" : evt.includes("MEETING") ? "MEETING" : "USER"),
         entityId: `entity-${i}`,
         entityLabel: `Entity ${i + 1}`,
         eventType: evt,
@@ -635,4 +659,31 @@ export function computeScholarStats(scholarId: string) {
 
 export function getSyllabus() {
   return { assignmentWeight: db.orgSettings.assignmentWeight, attendanceWeight: db.orgSettings.attendanceWeight };
+}
+
+/**
+ * Per-scholar task status overrides so that "Not started"/"In progress"
+ * toggling on one scholar never mutates the shared assignment record.
+ */
+export const scholarStatusOverrides = new Map<string, AssignmentStatus>();
+
+export function getScholarTaskStatus(
+  scholarId: string,
+  assignmentId: string,
+  fallback: AssignmentStatus
+): AssignmentStatus {
+  return scholarStatusOverrides.get(`${scholarId}:${assignmentId}`) ?? fallback;
+}
+
+/**
+ * Records an audit log entry on the in-memory store. New entries are newest-first.
+ */
+export function recordAuditLog(entry: Omit<AuditLogEntry, "id" | "at"> & { at?: string; id?: string }) {
+  const log: AuditLogEntry = {
+    id: entry.id ?? `audit-${uid()}`,
+    ...entry,
+    at: entry.at ?? new Date().toISOString(),
+  };
+  db.auditLogs.unshift(log);
+  return log;
 }

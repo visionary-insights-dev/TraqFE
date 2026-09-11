@@ -13,9 +13,14 @@ export async function GET(request: Request) {
   const from = url.searchParams.get("from");
   const to = url.searchParams.get("to");
 
-  let logs = [...db.auditLogs];
+  let logs = [...db.auditLogs].sort(
+    (a, b) => new Date(b.at).getTime() - new Date(a.at).getTime()
+  );
 
-  if (entityType) logs = logs.filter((l) => l.entityType === entityType);
+  if (entityType) {
+    const normalized = entityType.toUpperCase();
+    logs = logs.filter((l) => l.entityType.toUpperCase() === normalized);
+  }
   if (actor) logs = logs.filter((l) => l.actorName?.toLowerCase().includes(actor.toLowerCase()));
   if (eventType) logs = logs.filter((l) => l.eventType === eventType);
   if (from) logs = logs.filter((l) => l.at >= from);

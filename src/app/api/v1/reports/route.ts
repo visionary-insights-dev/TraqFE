@@ -1,5 +1,6 @@
-import { db, success, error, requireUser, mockId } from "@/lib/api/mock-db";
+import { db, success, error, requireUser, mockId, recordAuditLog } from "@/lib/api/mock-db";
 import type { ReportStatus } from "@/lib/types";
+import type { UserRole } from "@/stores/types";
 
 export async function GET(request: Request) {
   const user = await requireUser(request);
@@ -27,12 +28,25 @@ export async function POST(request: Request) {
   };
   db.reports.push(report);
 
+  const author = db.users.find((u) => u.id === user.sub);
+
   // Simulate async completion
   setTimeout(() => {
     report.status = "COMPLETED";
     (report as { completedAt?: string }).completedAt = new Date().toISOString();
-    (report as { downloadUrl?: string }).downloadUrl = `https://storage.scholarlink.dev/reports/${report.id}.pdf`;
+    (report as { downloadUrl?: string }).downloadUrl = `/api/v1/reports/${report.id}/download?format=csv`;
   }, 5000);
+
+  recordAuditLog({
+    entityType: "REPORT",
+    entityId: report.id,
+    entityLabel: report.name,
+    eventType: "REPORT_GENERATED",
+    actorName: author?.name ?? "System",
+    actorRole: user.role as UserRole,
+    action: "report generated",
+    detail: `Report "${report.name}" queued for generation`,
+  });
 
   return success(report);
 }

@@ -10,10 +10,12 @@ export async function POST(request: Request) {
   }
 
   const fileKey = `uploads/${mockId()}/${body.filename}`;
-
+  const signedUrl = `/api/v1/uploads?key=${encodeURIComponent(fileKey)}`;
+  // uploadUrl is relative to the API base so the axios client resolves it
+  // against /api/v1. publicUrl is an absolute app path for <img>/<a> use.
   return success({
-    uploadUrl: `https://storage.scholarlink.dev/upload?key=${fileKey}`,
+    uploadUrl: `/uploads?key=${encodeURIComponent(fileKey)}`,
     fileKey,
-    publicUrl: `https://storage.scholarlink.dev/${fileKey}`,
+    publicUrl: signedUrl,
   });
 }

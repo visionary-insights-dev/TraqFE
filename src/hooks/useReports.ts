@@ -1,5 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createReport, getReport, getReports } from "@/lib/api/admin";
+import {
+  createReport,
+  downloadReport,
+  getReport,
+  getReports,
+} from "@/lib/api/admin";
 import type { Report, ReportInput } from "@/lib/types";
 import { queryKeys } from "./keys";
 import { useAsyncTask } from "./useAsyncTask";
@@ -28,4 +33,15 @@ export function useReportTask(reportId: string | null) {
     getReport,
     reportId
   );
+}
+
+/**
+ * Downloads a completed report as a raw Blob. The caller is responsible for
+ * triggering the save (object URL + anchor click) so it can supply a filename.
+ */
+export function useDownloadReport() {
+  return useMutation({
+    mutationFn: ({ reportId, format }: { reportId: string; format: "csv" | "pdf" }) =>
+      downloadReport(reportId, format),
+  });
 }

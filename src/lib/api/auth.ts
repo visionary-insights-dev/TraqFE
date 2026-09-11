@@ -1,5 +1,4 @@
-import axios from "axios";
-import { post, patch } from "./client";
+import { post, patch, put } from "./client";
 import {
   type LoginPayload,
   type LoginResponse,
@@ -63,11 +62,17 @@ export function getProfileUploadUrl(
   });
 }
 
-export async function uploadFileDirect(
-  uploadUrl: string,
-  file: File
-): Promise<void> {
-  await axios.put(uploadUrl, file, {
-    headers: { "Content-Type": file.type },
-  });
+/**
+ * Uploads the raw file bytes through apiClient (so the Bearer token is
+ * attached) to the mock in-memory upload store, then returns the public URL
+ * used for <img>/avatar display.
+ */
+export async function uploadProfileImage(file: File): Promise<{ url: string }> {
+  const { fileKey } = await getProfileUploadUrl(file.name, file.type);
+  const uploaded = await put<{ key: string; url: string }>(
+    `/uploads?key=${encodeURIComponent(fileKey)}`,
+    file,
+    { headers: { "Content-Type": file.type } }
+  );
+  return { url: uploaded.url };
 }

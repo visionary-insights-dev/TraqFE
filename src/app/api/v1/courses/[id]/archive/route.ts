@@ -1,4 +1,5 @@
-import { db, success, error, requireUser } from "@/lib/api/mock-db";
+import { db, success, error, requireUser, recordAuditLog } from "@/lib/api/mock-db";
+import type { UserRole } from "@/stores/types";
 
 export async function POST(
   request: Request,
@@ -12,6 +13,24 @@ export async function POST(
   if (idx < 0) return error("NOT_FOUND", "Course not found", 404);
 
   const course = db.courses[idx];
+  if (course.archived) {
+    return error("ALREADY_ARCHIVED", "Course is already archived", 409);
+  }
+
+  course.archived = true;
+
+  const author = db.users.find((u) => u.id === user.sub);
+  recordAuditLog({
+    entityType: "COURSE",
+    entityId: course.id,
+    entityLabel: course.name,
+    eventType: "COURSE_ARCHIVED",
+    actorName: author?.name ?? "System",
+    actorRole: user.role as UserRole,
+    action: "course archived",
+    detail: `Course "${course.name}" archived`,
+  });
+
   const program = course.programId ? db.programs.find((p) => p.id === course.programId) : null;
 
   return success({

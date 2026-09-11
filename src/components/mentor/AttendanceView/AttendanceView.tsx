@@ -110,6 +110,9 @@ export const AttendanceView = () => {
                         {meeting.courseName
                           ? ` · ${meeting.courseName}`
                           : null}
+                        {meeting.attendeeCount !== undefined
+                          ? ` · ${meeting.attendeeCount} attending`
+                          : null}
                       </p>
                     </div>
                   </div>

@@ -1,6 +1,7 @@
 import { get, post, patch } from "./client";
 import {
   type Assignment,
+  type AssignmentStatusInput,
   type ChatMessage,
   type Cohort,
   type Conversation,
@@ -9,6 +10,7 @@ import {
   type ProfileUpdateInput,
   type Resource,
   type ScholarProfile,
+  type UpcomingMeeting,
 } from "@/lib/types";
 
 export function getDashboardAnalytics(): Promise<DashboardAnalytics> {
@@ -27,6 +29,17 @@ export function submitAssignment(
 
 export function getMyCourses(): Promise<Course[]> {
   return get<Course[]>("/scholars/me/courses");
+}
+
+export function getScholarMeetings(): Promise<UpcomingMeeting[]> {
+  return get<UpcomingMeeting[]>("/scholars/me/meetings");
+}
+
+export function updateTaskStatus(
+  assignmentId: string,
+  status: AssignmentStatusInput["status"]
+): Promise<{ id: string; status: AssignmentStatusInput["status"] }> {
+  return patch(`/scholars/me/assignments/${assignmentId}/status`, { status });
 }
 
 export function getResources(): Promise<Resource[]> {

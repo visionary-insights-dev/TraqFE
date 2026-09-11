@@ -27,10 +27,10 @@ export const ConversationList = ({
               data-conv-active={isActive ? "true" : undefined}
               data-conv-id={conversation.id}
               className={cn(
-                "flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-[0.99]",
+                "relative flex w-full items-center gap-3 overflow-hidden rounded-xl px-3 py-3 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 active:scale-[0.99]",
                 isActive
-                  ? "bg-gradient-to-r from-brand-50 to-brand-50/40 shadow-sm ring-1 ring-brand-200"
-                  : "hover:bg-white/70"
+                  ? "ember-glow bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-md shadow-amber-500/25"
+                  : "hover:bg-white/70 dark:hover:bg-white/5"
               )}
             >
               {conversation.avatarUrl ? (
@@ -38,15 +38,20 @@ export const ConversationList = ({
                 <img
                   src={conversation.avatarUrl}
                   alt=""
-                  className="h-11 w-11 shrink-0 rounded-full object-cover ring-2 ring-white"
+                  className={cn(
+                    "h-11 w-11 shrink-0 rounded-full object-cover ring-2 transition-all duration-300",
+                    isActive
+                      ? "ring-white/60"
+                      : "ring-white dark:ring-white/20"
+                  )}
                 />
               ) : (
                 <div
                   className={cn(
-                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ring-2 ring-white",
+                    "flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ring-2 transition-transform duration-300 group-hover:scale-105",
                     isActive
-                      ? "bg-gradient-to-br from-brand-600 to-brand-700 text-white"
-                      : "bg-gradient-to-br from-neutral-100 to-neutral-200 text-neutral-700"
+                      ? "bg-white/25 text-amber-950 ring-white/60"
+                      : "bg-gradient-to-br from-neutral-100 to-neutral-200 text-neutral-700 ring-white dark:from-slate-700 dark:to-slate-800 dark:text-slate-200 dark:ring-white/20"
                   )}
                 >
                   {initials}
@@ -54,11 +59,25 @@ export const ConversationList = ({
               )}
               <div className="min-w-0 flex-1">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="truncate font-medium text-neutral-900">
+                  <p
+                    className={cn(
+                      "truncate font-medium",
+                      isActive
+                        ? "text-amber-950"
+                        : "text-neutral-900 dark:text-white"
+                    )}
+                  >
                     {conversation.name}
                   </p>
                   {conversation.lastMessage ? (
-                    <span className="shrink-0 text-xs font-medium text-neutral-500">
+                    <span
+                      className={cn(
+                        "shrink-0 text-xs font-medium",
+                        isActive
+                          ? "text-amber-950/80"
+                          : "text-neutral-500 dark:text-slate-400"
+                      )}
+                    >
                       {relativeTime(conversation.lastMessage.at)}
                     </span>
                   ) : null}
@@ -67,15 +86,24 @@ export const ConversationList = ({
                   <p
                     className={cn(
                       "truncate text-sm",
-                      conversation.unreadCount > 0
-                        ? "font-medium text-neutral-800"
-                        : "text-neutral-500"
+                      isActive
+                        ? "font-medium text-amber-950/80"
+                        : conversation.unreadCount > 0
+                          ? "font-medium text-neutral-800 dark:text-slate-100"
+                          : "text-neutral-500 dark:text-slate-400"
                     )}
                   >
                     {conversation.lastMessage?.text ?? "No messages yet"}
                   </p>
                   {conversation.unreadCount > 0 ? (
-                    <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-brand-500 to-brand-700 px-1.5 text-xs font-bold text-white shadow-sm">
+                    <span
+                      className={cn(
+                        "flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full px-1.5 text-xs font-bold shadow-md",
+                        isActive
+                          ? "bg-white/30 text-amber-950"
+                          : "ember-glow bg-gradient-to-b from-amber-400 to-amber-500 text-amber-950 shadow-amber-500/40"
+                      )}
+                    >
                       {conversation.unreadCount}
                     </span>
                   ) : null}

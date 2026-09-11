@@ -12,6 +12,7 @@ import {
 import { queryKeys } from "@/hooks/keys";
 import { getUser } from "@/stores/auth";
 import { EmptyState, ErrorState } from "@/components/ui";
+import { ScholarPageHeader } from "@/components/scholar/shared";
 import { ConversationList } from "./ConversationList";
 import { MessageThread } from "./MessageThread";
 
@@ -89,17 +90,16 @@ export const ChatView = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-neutral-900">Messages</h1>
-        <p className="mt-1 text-neutral-600">
-          Chat with your mentors and cohort.
-        </p>
-      </div>
+      <ScholarPageHeader
+        eyebrow="Messages"
+        title="Messages"
+        subtitle="Chat with your mentors and cohort."
+      />
 
       {!isOnline ? (
         <div
           role="status"
-          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm"
+          className="glass-surface flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-warning-dark shadow-sm dark:text-amber-300"
         >
           <WifiOff className="h-4 w-4 shrink-0" aria-hidden="true" />
           You&apos;re offline. Messages can&apos;t be sent right now.
@@ -125,8 +125,8 @@ export const ChatView = () => {
               description="Messages from your mentors will appear here."
             />
           ) : conversationsQuery.data ? (
-            <div className="glass-card p-2 lg:h-[calc(100vh-17rem)] lg:overflow-y-auto">
-              <p className="px-3 pt-2 text-sm font-semibold text-neutral-600">
+            <div className="glass-card glass-edge rounded-2xl p-2 lg:h-[calc(100vh-17rem)] lg:overflow-y-auto">
+              <p className="px-3 pt-2 text-sm font-semibold text-neutral-600 dark:text-slate-400">
                 {conversationsQuery.data.length} conversation
                 {conversationsQuery.data.length === 1 ? "" : "s"}
               </p>
@@ -151,7 +151,7 @@ export const ChatView = () => {
           hidden={emptyConversations}
         >
           {activeConversation ? (
-            <div className="glass-card h-[calc(100vh-17rem)] overflow-hidden">
+            <div className="glass-card glass-edge h-[calc(100vh-17rem)] overflow-hidden rounded-2xl">
               <MessageThread
                 conversationName={activeConversation.name}
                 messages={messagesQuery.data ?? []}
@@ -166,7 +166,7 @@ export const ChatView = () => {
               />
             </div>
           ) : (
-            <div className="hidden h-[calc(100vh-17rem)] items-center justify-center rounded-xl border border-dashed border-neutral-300 bg-white/50 text-center text-neutral-500 backdrop-blur lg:flex">
+            <div className="hidden h-[calc(100vh-17rem)] items-center justify-center rounded-2xl border border-dashed border-neutral-300/80 bg-white/40 text-center text-sm text-neutral-500 backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-slate-400 lg:flex">
               Select a conversation to start chatting
             </div>
           )}
@@ -184,9 +184,13 @@ function ChatSkeleton() {
       aria-busy="true"
       aria-label="Loading conversations"
     >
-      <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+      <div className="space-y-2">
+        <div className="skeleton-shimmer h-3 w-28 rounded-md" />
+        <div className="skeleton-shimmer h-8 w-40 rounded-lg" />
+        <div className="skeleton-shimmer h-3 w-64 rounded-md" />
+      </div>
       <div className="grid gap-4 lg:grid-cols-[320px_1fr] lg:gap-6">
-        <div className="space-y-2 rounded-xl border border-white/40 bg-white/70 p-2 backdrop-blur">
+        <div className="space-y-2 rounded-2xl border border-white/40 bg-white/70 p-2 backdrop-blur dark:bg-white/5">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
@@ -201,7 +205,7 @@ function ChatSkeleton() {
           ))}
         </div>
         <div className="hidden lg:block">
-          <div className="skeleton-shimmer h-[calc(100vh-17rem)] rounded-xl" />
+          <div className="skeleton-shimmer h-[calc(100vh-17rem)] rounded-2xl" />
         </div>
       </div>
     </div>

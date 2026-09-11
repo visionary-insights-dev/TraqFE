@@ -3,18 +3,21 @@
 import { useState } from "react";
 import { Pencil, Plus, WifiOff } from "lucide-react";
 import { AdminPageHeader, DataTable, type DataTableColumn } from "@/components/admin";
-import { Button, ErrorState } from "@/components/ui";
+import { Badge, Button, ErrorState } from "@/components/ui";
 import {
   useAdminCourses,
   useArchiveCourse,
   useConnectivity,
   useCreateCourse,
   usePrograms,
+  useUnarchiveCourse,
   useUpdateCourse,
 } from "@/hooks";
 import type { AdminCourse } from "@/lib/types";
-import { ArchiveCourseModal } from "./ArchiveCourseModal";
+import { ArchiveCourseModal, UnarchiveCourseModal } from "./index";
 import { CourseFormModal } from "./CourseFormModal";
+
+type CourseFilter = "all" | "active" | "archived";
 
 export const CoursesView = () => {
   const isOnline = useConnectivity();
@@ -24,12 +27,16 @@ export const CoursesView = () => {
   const createMutation = useCreateCourse();
   const updateMutation = useUpdateCourse();
   const archiveMutation = useArchiveCourse();
+  const unarchiveMutation = useUnarchiveCourse();
 
   const [formOpen, setFormOpen] = useState(false);
   const [initial, setInitial] = useState<AdminCourse | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<AdminCourse | null>(null);
   const [archiveError, setArchiveError] = useState<string | null>(null);
+  const [unarchiveTarget, setUnarchiveTarget] = useState<AdminCourse | null>(null);
+  const [unarchiveError, setUnarchiveError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<CourseFilter>("all");
 
   const handleFormSubmit = async (input: {
     name: string;
@@ -64,6 +71,19 @@ export const CoursesView = () => {
     }
   };
 
+  const handleUnarchive = async () => {
+    if (!unarchiveTarget) return;
+    setUnarchiveError(null);
+    try {
+      await unarchiveMutation.mutateAsync(unarchiveTarget.id);
+      setUnarchiveTarget(null);
+    } catch (err) {
+      setUnarchiveError(
+        err instanceof Error ? err.message : "Could not restore the course."
+      );
+    }
+  };
+
   if (isLoading) {
     return <CoursesSkeleton />;
   }
@@ -84,7 +104,11 @@ export const CoursesView = () => {
     );
   }
 
-  const courses = data ?? [];
+  const courses = (data ?? []).filter((c) => {
+    if (filter === "active") return !c.archived;
+    if (filter === "archived") return c.archived;
+    return true;
+  });
 
   const columns: Array<DataTableColumn<AdminCourse>> = [
     {
@@ -93,7 +117,10 @@ export const CoursesView = () => {
       sortValue: (c) => c.name,
       render: (c) => (
         <div>
-          <p className="font-medium text-neutral-900">{c.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="font-medium text-neutral-900">{c.name}</p>
+            {c.archived ? <Badge variant="neutral">Archived</Badge> : null}
+          </div>
           {c.code ? (
             <p className="mt-0.5 text-xs text-neutral-500">{c.code}</p>
           ) : null}
@@ -120,9 +147,12 @@ export const CoursesView = () => {
       key: "mentor",
       header: "Mentor",
       sortValue: (c) => c.mentorName ?? "",
-      render: (c) => (
-        <span className="text-neutral-600">{c.mentorName ?? "Unassigned"}</span>
-      ),
+      render: (c) =>
+        c.mentorName ? (
+          <span className="text-neutral-600">{c.mentorName}</span>
+        ) : (
+          <Badge variant="amber">Unassigned</Badge>
+        ),
     },
     {
       key: "actions",
@@ -142,16 +172,29 @@ export const CoursesView = () => {
           >
             <Pencil className="h-4 w-4" aria-hidden="true" />
           </button>
-          <button
-            type="button"
-            onClick={() => {
-              setArchiveError(null);
-              setArchiveTarget(c);
-            }}
-            className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:bg-danger-light hover:text-danger-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
-          >
-            Archive
-          </button>
+          {c.archived ? (
+            <button
+              type="button"
+              onClick={() => {
+                setUnarchiveError(null);
+                setUnarchiveTarget(c);
+              }}
+              className="inline-flex items-center gap-1 rounded-md px-2.5 py-1.5 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+            >
+              Unarchive
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setArchiveError(null);
+                setArchiveTarget(c);
+              }}
+              className="rounded-md px-2.5 py-1.5 text-xs font-semibold text-neutral-600 transition-colors hover:bg-danger-light hover:text-danger-dark focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger"
+            >
+              Archive
+            </button>
+          )}
         </div>
       ),
     },
@@ -185,6 +228,32 @@ export const CoursesView = () => {
           You&apos;re offline. Courses data may not be up to date.
         </div>
       ) : null}
+
+      <div
+        role="group"
+        aria-label="Filter courses"
+        className="inline-flex rounded-lg bg-neutral-100 p-1"
+      >
+        {([
+          ["all", "All"],
+          ["active", "Active"],
+          ["archived", "Archived"],
+        ] as const).map(([value, label]) => (
+          <button
+            key={value}
+            type="button"
+            onClick={() => setFilter(value)}
+            aria-pressed={filter === value}
+            className={`rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+              filter === value
+                ? "bg-white text-neutral-900 shadow-sm"
+                : "text-neutral-600 hover:text-neutral-900"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
 
       <DataTable<AdminCourse>
         caption="Courses"
@@ -226,6 +295,15 @@ export const CoursesView = () => {
         onConfirm={handleArchive}
         isSubmitting={archiveMutation.isPending}
         error={archiveError}
+      />
+
+      <UnarchiveCourseModal
+        course={unarchiveTarget}
+        open={unarchiveTarget !== null}
+        onClose={() => setUnarchiveTarget(null)}
+        onConfirm={handleUnarchive}
+        isSubmitting={unarchiveMutation.isPending}
+        error={unarchiveError}
       />
     </div>
   );

@@ -54,6 +54,7 @@ jest.mock("next/navigation", () => ({
 jest.mock("@/hooks/scholar", () => ({
   useScholarAssignments: jest.fn(),
   useMarkAsDone: jest.fn(),
+  useUpdateTaskStatus: jest.fn(),
 }));
 
 jest.mock("@/hooks/useConnectivity", () => ({
@@ -64,9 +65,8 @@ jest.mock("@/hooks/useSocketEvents", () => ({
   useSocketEvents: jest.fn(),
 }));
 
-const { useScholarAssignments, useMarkAsDone } = jest.requireMock(
-  "@/hooks/scholar"
-);
+const { useScholarAssignments, useMarkAsDone, useUpdateTaskStatus } =
+  jest.requireMock("@/hooks/scholar");
 const { useConnectivity } = jest.requireMock("@/hooks/useConnectivity");
 
 function queryResult<T>(
@@ -109,10 +109,19 @@ const mockSubmit = {
   isError: false,
 };
 
+const mockUpdateTaskStatus = {
+  mutate: jest.fn(),
+  mutateAsync: jest.fn(),
+  isPending: false,
+  isError: false,
+  variables: undefined,
+};
+
 beforeEach(() => {
   jest.clearAllMocks();
   useConnectivity.mockReturnValue(true);
   useMarkAsDone.mockReturnValue(mockSubmit);
+  useUpdateTaskStatus.mockReturnValue(mockUpdateTaskStatus);
 });
 
 describe("AssignmentsView", () => {

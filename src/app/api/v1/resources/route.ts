@@ -7,9 +7,11 @@ export async function GET(request: Request) {
   const role = user.role as string;
 
   if (role === "MENTOR") {
-    return success(
-      db.resources.filter((r) => r.uploadedBy === user.sub)
-    );
+    return success(db.resources.filter((r) => r.uploadedBy === user.sub));
+  }
+
+  if (role === "SCHOLAR") {
+    return success(db.resources.filter((r) => r.visibility === "PUBLIC"));
   }
 
   return success(db.resources);
@@ -24,14 +26,22 @@ export async function POST(request: Request) {
     return error("VALIDATION_ERROR", "Name and type are required");
   }
 
+  const visibility: "PUBLIC" | "PRIVATE" =
+    body.visibility === "PRIVATE" ? "PRIVATE" : "PUBLIC";
+
   const resource = {
     id: `res-${mockId()}`,
     name: body.name,
     type: body.type,
     courseId: body.courseId,
     uploadedAt: new Date().toISOString(),
-    url: body.url ?? `https://storage.scholarlink.dev/resources/${body.name}`,
+    url:
+      body.url ??
+      (body.fileKey
+        ? `/api/v1/uploads?key=${encodeURIComponent(body.fileKey)}`
+        : `https://storage.scholarlink.dev/resources/${body.name}`),
     uploadedBy: user.sub as string,
+    visibility,
   };
   db.resources.push(resource);
 

@@ -11,42 +11,68 @@ export const Sidebar = ({
   return (
     <aside
       className={cn(
-        "flex h-full w-64 shrink-0 flex-col border-r border-neutral-200 bg-white",
+        "glass-surface glass-edge flex h-full w-64 shrink-0 flex-col border-r border-white/40 dark:border-white/8",
         className
       )}
       {...props}
     >
       {brand ? (
-        <div className="flex h-16 items-center border-b border-neutral-200 px-5">
+        <div className="flex h-16 items-center border-b border-white/40 px-5 dark:border-white/5">
           {brand}
         </div>
       ) : null}
-      <nav className="flex-1 space-y-1 overflow-y-auto p-3" aria-label="Main navigation">
-        {items.map((item) => (
-          <SidebarNavItem key={item.href} item={item} />
+      <nav
+        className="flex-1 space-y-1.5 overflow-y-auto p-3"
+        aria-label="Main navigation"
+      >
+        {items.map((item, index) => (
+          <SidebarNavItem key={item.href} item={item} index={index} />
         ))}
       </nav>
       {footer ? (
-        <div className="border-t border-neutral-200 p-3">{footer}</div>
+        <div className="border-t border-white/40 p-3 dark:border-white/5">
+          {footer}
+        </div>
       ) : null}
     </aside>
   );
 };
 
-export const SidebarNavItem = ({ item }: { item: NavItem }) => {
+export const SidebarNavItem = ({
+  item,
+  index = 0,
+}: {
+  item: NavItem;
+  index?: number;
+}) => {
   const Icon = item.icon;
+  const delay = ["dash-1", "dash-2", "dash-3", "dash-4", "dash-5"][
+    index % 5
+  ];
   return (
     <a
       href={item.href}
       aria-current={item.active ? "page" : undefined}
       className={cn(
-        "flex min-h-[44px] items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+        "dash-enter group flex min-h-[44px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 active:scale-[0.98]",
+        delay,
         item.active
-          ? "bg-brand-50 text-brand-700"
-          : "text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900"
+          ? "ember-glow bg-gradient-to-r from-amber-400 to-amber-500 text-amber-950 shadow-md shadow-amber-500/30"
+          : "text-neutral-700 hover:bg-white/60 hover:text-neutral-900 dark:text-slate-300 dark:hover:bg-white/5 dark:hover:text-white"
       )}
     >
-      {Icon ? <Icon className="h-5 w-5 shrink-0" aria-hidden="true" /> : null}
+      {Icon ? (
+        <span
+          className={cn(
+            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200",
+            item.active
+              ? "bg-white/25 text-amber-950"
+              : "bg-white/50 text-neutral-500 group-hover:bg-white/80 group-hover:text-neutral-800 dark:bg-white/5 dark:text-slate-400 dark:group-hover:bg-white/10 dark:group-hover:text-slate-200"
+          )}
+        >
+          <Icon className="h-4.5 w-4.5" aria-hidden="true" />
+        </span>
+      ) : null}
       <span className="flex-1 truncate">{item.label}</span>
       {item.badge ? item.badge : null}
     </a>

@@ -1,4 +1,5 @@
-import { db, success, error, requireUser, mockId } from "@/lib/api/mock-db";
+import { db, success, error, requireUser, mockId, recordAuditLog } from "@/lib/api/mock-db";
+import type { UserRole } from "@/stores/types";
 
 export async function GET(request: Request) {
   const user = await requireUser(request);
@@ -35,7 +36,9 @@ export async function GET(request: Request) {
         code: c.code,
         program: program ? { id: program.id, name: program.name } : null,
         scholarCount,
+        mentorId: mentor?.id,
         mentorName: mentor?.name,
+        archived: c.archived,
         createdAt: c.createdAt,
       };
     })
@@ -56,9 +59,22 @@ export async function POST(request: Request) {
     name: body.name,
     code: body.code,
     programId: body.programId,
+    archived: false,
     createdAt: new Date().toISOString(),
   };
   db.courses.push(course);
+
+  const author = db.users.find((u) => u.id === user.sub);
+  recordAuditLog({
+    entityType: "COURSE",
+    entityId: course.id,
+    entityLabel: course.name,
+    eventType: "COURSE_ARCHIVED",
+    actorName: author?.name ?? "System",
+    actorRole: user.role as UserRole,
+    action: "course created",
+    detail: `Course "${course.name}" created`,
+  });
 
   const program = course.programId ? db.programs.find((p) => p.id === course.programId) : null;
 

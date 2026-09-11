@@ -1,5 +1,4 @@
 import { db, success, error, requireUser, computeScholarStats } from "@/lib/api/mock-db";
-import type { PeopleStatus } from "@/lib/types";
 
 export async function GET(request: Request) {
   const user = await requireUser(request);
@@ -27,7 +26,7 @@ export async function GET(request: Request) {
           courseName: db.courses[0]?.name,
           mentorName: mentor?.name,
           programName: db.programs[0]?.name,
-          status: "ACTIVE" as PeopleStatus,
+          status: u.status,
           progress: {
             overall: stats.overall,
             assignmentPct: stats.assignmentPct,
@@ -55,7 +54,7 @@ export async function GET(request: Request) {
           email: u.email,
           avatarUrl: u.avatarUrl,
           title: u.title,
-          status: "ACTIVE" as PeopleStatus,
+          status: u.status,
           scholarCount: scholars.length,
           courseCount: courses.length,
           courses: courses.map((cid) => {
