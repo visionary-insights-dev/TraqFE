@@ -2,13 +2,11 @@
 import { middleware, routeRequest } from "./middleware";
 
 // Middleware is the security boundary for role-based routing. It reads the
-// HTTP-only refresh_token cookie (the access token lives in client memory and
-// is invisible to the edge), decodes the role, and either allows the request
-// through or redirects. We inject a stub token-verifier so the routing
-// decisions can be exercised deterministically without loading the ESM-only
-// `jose` package (which the next/jest transform cannot transpile). The real
-// `verifyRefreshToken` binds jose's jwtVerify to getSecret() and is exercised
-// implicitly via this interface.
+// httpOnly traq_session cookie (set server-side by /api/auth/session),
+// parses the role, and either allows the request through or redirects. We
+// inject a stub session parser so the routing decisions can be exercised
+// deterministically. The real `parseSession` JSON.parse's the cookie value.
+
 jest.mock("next/server", () => ({
   NextResponse: {
     next: jest.fn(() => ({ kind: "next" })),
@@ -25,7 +23,7 @@ function makeRequest(pathname: string, cookie?: string) {
     nextUrl: urlWithClone,
     cookies: {
       get: (name: string) =>
-        name === "refresh_token" && cookie ? { value: cookie } : undefined,
+        name === "traq_session" && cookie ? { value: cookie } : undefined,
     },
   } as unknown as Parameters<typeof routeRequest>[0];
 }
@@ -39,8 +37,7 @@ function redirectPath(response: unknown): string {
 
 describe("middleware role guards", () => {
   // Next.js calls middleware as `middleware(request, event)`; the exported
-  // entry point must not crash when the second argument is a fetch event
-  // (which previously landed on the verifier parameter).
+  // entry point must not crash when the second argument is a fetch event.
   it("handles the Next.js (request, event) invocation shape", async () => {
     const response = await middleware(makeRequest("/admin/dashboard"), {
       waitUntil: () => undefined,
@@ -49,131 +46,76 @@ describe("middleware role guards", () => {
     expect(redirectPath(response)).toBe("/auth/sign-in");
   });
 
-  // No token on a protected route must bounce the user to sign-in.
-  it("redirects to sign-in when there is no refresh token on a protected route", async () => {
-    const verify = jest.fn();
-    const response = await routeRequest(makeRequest("/admin/dashboard"), verify);
-    expect(verify).not.toHaveBeenCalled();
+  // No session on a protected route must bounce the user to sign-in.
+  it("redirects to sign-in when there is no session cookie on a protected route", async () => {
+    const parse = jest.fn();
+    const response = await routeRequest(makeRequest("/admin/dashboard"), parse);
+    expect(parse).not.toHaveBeenCalled();
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/auth/sign-in");
   });
 
-  // A malformed/expired token (verifier returns null / throws) is treated as
-  // unauthenticated and bounced to sign-in rather than admitted.
-  it("redirects to sign-in when the refresh token fails to verify", async () => {
-    const verify = jest.fn().mockResolvedValue(null);
-    const response = await routeRequest(makeRequest("/scholar/dashboard", "bad-token"), verify);
+  // A malformed session cookie (parser returns null) is treated as
+  // unauthenticated and bounced to sign-in.
+  it("redirects to sign-in when the session cookie fails to parse", async () => {
+    const parse = jest.fn().mockReturnValue(null);
+    const response = await routeRequest(makeRequest("/scholar/dashboard", "bad"), parse);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/auth/sign-in");
   });
 
-  // A valid SUPER_ADMIN token must be allowed through on /admin.
+  // A valid SUPER_ADMIN session must be allowed through on /admin.
   it("allows a super admin through the admin area", async () => {
-    const verify = jest.fn().mockResolvedValue({ role: "SUPER_ADMIN" });
-    const response = await routeRequest(makeRequest("/admin/dashboard", "token"), verify);
-    expect(verify).toHaveBeenCalledWith("token");
+    const parse = jest.fn().mockReturnValue({ role: "SUPER_ADMIN" });
+    const response = await routeRequest(makeRequest("/admin/dashboard", "sess"), parse);
+    expect(parse).toHaveBeenCalledWith("sess");
     expect(response).toMatchObject({ kind: "next" });
   });
 
-  // A SCHOLAR trying to reach /admin (role mismatch) is not silently dropped —
-  // they are redirected to their own dashboard.
+  // A SCHOLAR trying to reach /admin (role mismatch) is redirected to their
+  // own dashboard.
   it("redirects a scholar away from the admin area (role mismatch)", async () => {
-    const verify = jest.fn().mockResolvedValue({ role: "SCHOLAR" });
-    const response = await routeRequest(makeRequest("/admin/dashboard", "token"), verify);
+    const parse = jest.fn().mockReturnValue({ role: "SCHOLAR" });
+    const response = await routeRequest(makeRequest("/admin/dashboard", "sess"), parse);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
 
   // A MENTOR is admitted to the mentor area.
   it("allows a mentor into the mentor area", async () => {
-    const verify = jest.fn().mockResolvedValue({ role: "MENTOR" });
-    const response = await routeRequest(makeRequest("/mentor/scholars", "token"), verify);
+    const parse = jest.fn().mockReturnValue({ role: "MENTOR" });
+    const response = await routeRequest(makeRequest("/mentor/scholars", "sess"), parse);
     expect(response).toMatchObject({ kind: "next" });
   });
 
   // Already-authenticated users should not sit on the auth screens; they get
   // bounced to their role home.
   it("redirects an authenticated scholar away from /auth to their role home", async () => {
-    const verify = jest.fn().mockResolvedValue({ role: "SCHOLAR" });
-    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
+    const parse = jest.fn().mockReturnValue({ role: "SCHOLAR" });
+    const response = await routeRequest(makeRequest("/auth/sign-in", "sess"), parse);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/scholar/dashboard");
   });
 
-  // A token whose payload carries no role is treated as unauthenticated on
+  // A session whose payload carries no role is treated as unauthenticated on
   // protected routes rather than being silently allowed through.
-  it("redirects to the landing page when the token payload is missing a role", async () => {
-    const verify = jest.fn().mockResolvedValue({});
-    const response = await routeRequest(makeRequest("/scholar/dashboard", "token"), verify);
+  it("redirects to the landing page when the session payload is missing a role", async () => {
+    const parse = jest.fn().mockReturnValue({});
+    const response = await routeRequest(makeRequest("/scholar/dashboard", "sess"), parse);
     expect(response).toMatchObject({ kind: "redirect" });
     expect(redirectPath(response)).toBe("/");
   });
 
-  // Public routes are reachable without a token.
-  it("allows public routes through without a token", async () => {
+  // Public routes are reachable without a session.
+  it("allows public routes through without a session", async () => {
     const response = await routeRequest(makeRequest("/"), jest.fn());
     expect(response).toMatchObject({ kind: "next" });
   });
 
-  // A user whose profile is incomplete is forced to onboarding even when
-  // trying to reach a protected role page.
-  it("forces an incomplete-profile user to onboarding on a protected route", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await routeRequest(makeRequest("/scholar/dashboard", "token"), verify);
-    expect(response).toMatchObject({ kind: "redirect" });
-    expect(redirectPath(response)).toBe("/auth/onboarding");
-  });
-
-  // An incomplete-profile user sitting on the onboarding screen is not
-  // bounced away (so they can complete it).
-  it("does not redirect an incomplete-profile user away from onboarding", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await routeRequest(makeRequest("/auth/onboarding", "token"), verify);
-    expect(response).toMatchObject({ kind: "next" });
-  });
-
-  // A complete-profile user is redirected from the auth area to their role
-  // home as before (profileComplete true).
-  it("redirects a complete-profile authenticated scholar away from /auth", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: true });
-    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
-    expect(response).toMatchObject({ kind: "redirect" });
-    expect(redirectPath(response)).toBe("/scholar/dashboard");
-  });
-
-  // An incomplete-profile user visiting the auth screens is allowed through so
-  // they can reach /auth/sign-in (sign out, switch accounts) — they must not
-  // be trapped in a redirect to onboarding.
-  it("allows an incomplete-profile user through /auth/sign-in (no onboarding trap)", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await routeRequest(makeRequest("/auth/sign-in", "token"), verify);
-    expect(response).toMatchObject({ kind: "next" });
-  });
-
-  // The root is always the public landing page — an incomplete session must
-  // never hijack it into onboarding.
-  it("serves the public landing page at / for an incomplete-profile session", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: false });
-    const response = await routeRequest(makeRequest("/", "token"), verify);
-    expect(response).toMatchObject({ kind: "next" });
-  });
-
-  // The root stays public even for a fully onboarded user.
-  it("serves the public landing page at / for a complete-profile session", async () => {
-    const verify = jest
-      .fn()
-      .mockResolvedValue({ role: "SCHOLAR", profileComplete: true });
-    const response = await routeRequest(makeRequest("/", "token"), verify);
+  // The root is always the public landing page.
+  it("serves the public landing page at / for a session", async () => {
+    const parse = jest.fn().mockReturnValue({ role: "SCHOLAR" });
+    const response = await routeRequest(makeRequest("/"), parse);
     expect(response).toMatchObject({ kind: "next" });
   });
 });

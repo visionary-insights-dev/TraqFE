@@ -6,9 +6,6 @@ import { clearAccessToken, clearUser } from "@/stores/auth";
 export function useLogout() {
   return useMutation({
     mutationFn: async () => {
-      // Ask the server to invalidate the httpOnly `refresh_token` cookie first
-      // (Set-Cookie Max-Age=0 on the mock backend). Local state is cleared
-      // even if the call fails so no in-memory session survives.
       try {
         await logout();
       } finally {
@@ -16,10 +13,18 @@ export function useLogout() {
         clearAccessToken();
         clearUser();
       }
+
+      // Clear the FE-domain session cookie so the middleware stops treating
+      // the user as authenticated on the next request.
+      try {
+        await fetch("/api/auth/session", { method: "DELETE" });
+      } catch {
+        // Best effort — the full page navigation below will re-run middleware
+        // which will see the missing cookie and bounce to sign-in.
+      }
     },
     // Full page navigation (not router.replace) so middleware re-runs against
-    // the now-cleared cookie. A client-side navigation skips middleware and
-    // could leave a still-valid refresh_token "alive" on the next page reload.
+    // the now-cleared cookie.
     onSettled: () => {
       window.location.assign(
         new URL("/auth/sign-in", window.location.origin).toString()

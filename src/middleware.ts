@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { type UserRole } from "@/stores/types";
 
-const REFRESH_TOKEN_COOKIE = "refresh_token";
+const SESSION_COOKIE = "traq_session";
 
-interface RefreshTokenPayload {
-  sub?: string;
+interface SessionPayload {
   role?: UserRole;
+  userId?: string;
   organizationId?: string;
-  email?: string;
-  name?: string;
-  profileComplete?: boolean;
 }
 
 const ROLE_HOME: Record<UserRole, string> = {
@@ -40,34 +37,23 @@ function matchRoute(
   return pathname === prefix || pathname.startsWith(prefix + "/");
 }
 
-function getSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET ?? process.env.REFRESH_TOKEN_SECRET;
-  if (!secret) {
-    return new TextEncoder().encode("dev-only-insecure-secret");
-  }
-  return new TextEncoder().encode(secret);
-}
-
-async function verifyRefreshToken(
-  token: string
-): Promise<RefreshTokenPayload | null> {
+/**
+ * Parse the traq_session cookie. The cookie is httpOnly and set server-side,
+ * so it cannot be tampered with by the client — no JWT verification needed.
+ */
+function parseSession(
+  value: string
+): SessionPayload | null {
   try {
-    // jose is ESM-only; a dynamic import keeps this module loadable in any
-    // environment (edge, node, tests) and only pulls jose in when actually
-    // verifying a token.
-    const { jwtVerify } = await import("jose");
-    const { payload } = await jwtVerify(token, getSecret(), {
-      algorithms: ["HS256"],
-    });
-    return payload as RefreshTokenPayload;
+    const parsed = JSON.parse(value) as SessionPayload;
+    if (parsed && typeof parsed.role === "string") {
+      return parsed;
+    }
+    return null;
   } catch {
     return null;
   }
 }
-
-export type VerifyRefreshToken = (
-  token: string
-) => Promise<RefreshTokenPayload | null>;
 
 // Next.js invokes middleware as `middleware(request, event)`. The event
 // (second arg) would override a verifier parameter, so the injectable logic
@@ -79,15 +65,17 @@ export async function middleware(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _event?: unknown
 ) {
-  return routeRequest(request, verifyRefreshToken);
+  return routeRequest(request, parseSession);
 }
+
+export type ParseSession = (value: string) => SessionPayload | null;
 
 export async function routeRequest(
   request: NextRequest,
-  verify: VerifyRefreshToken
+  parse: ParseSession
 ) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
+  const cookieValue = request.cookies.get(SESSION_COOKIE)?.value;
 
   let config: RouteConfig = publicRoutes;
   for (const [prefix, routeConfig] of Object.entries(roleRoutes)) {
@@ -100,44 +88,29 @@ export async function routeRequest(
     config = authRoutes;
   }
 
-  const payload = token ? await verify(token) : null;
-  const isAuthenticated = payload !== null;
+  const session = cookieValue ? parse(cookieValue) : null;
+  const isAuthenticated = session !== null;
 
   if (config.requireAuth) {
-    if (!isAuthenticated || !payload) {
+    if (!isAuthenticated || !session) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/sign-in";
       url.search = "";
       return NextResponse.redirect(url);
     }
-    const userRole = payload.role;
+    const userRole = session.role;
     if (!userRole || !config.roles?.includes(userRole)) {
       const url = request.nextUrl.clone();
       url.pathname = userRole ? ROLE_HOME[userRole] : "/";
       url.search = "";
       return NextResponse.redirect(url);
     }
-    // Force incomplete profiles to complete onboarding before accessing
-    // protected role pages.
-    if (payload.profileComplete === false) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/onboarding";
-      url.search = "";
-      return NextResponse.redirect(url);
-    }
     return NextResponse.next();
   }
 
-  if (config.redirectAuthed && isAuthenticated && payload?.role) {
-    // Auth screens must never trap an incomplete-profile user in an onboarding
-    // loop: someone holding a valid refresh cookie but without a completed
-    // profile still needs to reach /auth/sign-in to sign out or switch
-    // accounts. Only complete-profile users are bounced from the auth area to
-    // their role home; incomplete profiles are still funneled into onboarding
-    // by the requireAuth guard below when they try to reach a protected role
-    // page.
-    const home = ROLE_HOME[payload.role];
-    if (home && payload.profileComplete !== false) {
+  if (config.redirectAuthed && isAuthenticated && session?.role) {
+    const home = ROLE_HOME[session.role];
+    if (home) {
       const url = request.nextUrl.clone();
       url.pathname = home;
       url.search = "";
