@@ -1,7 +1,11 @@
 import { io, type Socket } from "socket.io-client";
 import { getAccessToken } from "@/stores/auth";
 
-const WS_URL = process.env.NEXT_PUBLIC_WS_URL ?? "";
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
+const WS_URL = USE_MOCK
+  ? ""
+  : (process.env.NEXT_PUBLIC_WS_URL ?? "");
 
 let socket: Socket | null = null;
 

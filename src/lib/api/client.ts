@@ -12,7 +12,11 @@ import {
 import { ApiClientError } from "./errors";
 import { type ApiErrorResponse } from "./types";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL ?? "/api/v1";
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === "true";
+
+const baseURL = USE_MOCK
+  ? "/api/v1"
+  : (process.env.NEXT_PUBLIC_API_URL ?? "/api/v1");
 
 export const apiClient = axios.create({
   baseURL,
