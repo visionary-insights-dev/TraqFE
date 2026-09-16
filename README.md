@@ -5,6 +5,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ```bash
 npm install
 npm run dev
+# App: http://localhost:3001  (TraqBE owns port 3000)
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for full setup instructions, AI tooling, and quality gates.
