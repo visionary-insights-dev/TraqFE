@@ -18,7 +18,8 @@ const ACTION_LABELS: Record<string, { label: string; variant: "green" | "red" | 
 
 export const AttendanceHistoryView = () => {
   const params = useParams<{ meetingId: string }>();
-  const { data, isLoading, isError, refetch } = useAttendanceHistory(params.meetingId);
+  const meetingId = params?.meetingId ?? "";
+  const { data, isLoading, isError, refetch } = useAttendanceHistory(meetingId);
 
   if (isLoading) {
     return (
@@ -95,7 +96,7 @@ export const AttendanceHistoryView = () => {
   return (
     <div className="space-y-6">
       <Link
-        href={`/admin/attendance/${params.meetingId}`}
+        href={`/admin/attendance/${meetingId}`}
         className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 transition-colors hover:text-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 rounded"
       >
         <ArrowLeft className="h-4 w-4" aria-hidden="true" />

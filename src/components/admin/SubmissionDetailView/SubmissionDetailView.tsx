@@ -34,15 +34,17 @@ const OVERRIDE_OPTIONS: Array<{ value: OverrideStatus; label: string }> = [
 
 export const SubmissionDetailView = () => {
   const params = useParams<{ assignmentId: string; submissionId: string }>();
+  const assignmentId = params?.assignmentId ?? "";
+  const submissionId = params?.submissionId ?? "";
   const isOnline = useConnectivity();
   const { data, isLoading, isError, refetch } = useSubmissionDetail(
-    params.assignmentId,
-    params.submissionId
+    assignmentId,
+    submissionId
   );
 
-  const verifyMutation = useAdminVerifySubmission(params.assignmentId, params.submissionId);
-  const resubmitMutation = useAdminRequestResubmission(params.assignmentId, params.submissionId);
-  const overrideMutation = useAdminOverrideSubmission(params.assignmentId, params.submissionId);
+  const verifyMutation = useAdminVerifySubmission(assignmentId, submissionId);
+  const resubmitMutation = useAdminRequestResubmission(assignmentId, submissionId);
+  const overrideMutation = useAdminOverrideSubmission(assignmentId, submissionId);
 
   const [action, setAction] = useState<ActionKind | null>(null);
   const [comment, setComment] = useState("");

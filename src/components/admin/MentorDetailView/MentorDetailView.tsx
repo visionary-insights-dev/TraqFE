@@ -12,7 +12,8 @@ import type { AdminScholar } from "@/lib/types";
 
 export const MentorDetailView = () => {
   const params = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useAdminMentor(params.id);
+  const id = params?.id ?? "";
+  const { data, isLoading, isError, refetch } = useAdminMentor(id);
 
   if (isLoading) {
     return (

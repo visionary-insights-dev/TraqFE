@@ -1,4 +1,4 @@
-import { db, success, error, requireUser } from "@/lib/api/mock-db";
+import { db, error, requireUser } from "@/lib/api/mock-db";
 import { buildCsv, buildPdf, buildReportRows } from "@/lib/api/report-export";
 
 export async function GET(

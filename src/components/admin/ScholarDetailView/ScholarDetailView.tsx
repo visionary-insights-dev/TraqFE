@@ -41,7 +41,8 @@ const STATUS_CONFIG: Record<
 
 export const ScholarDetailView = () => {
   const params = useParams<{ id: string }>();
-  const { data, isLoading, isError, refetch } = useAdminScholar(params.id);
+  const id = params?.id ?? "";
+  const { data, isLoading, isError, refetch } = useAdminScholar(id);
   const statusMutation = useAdminUpdateUserStatus();
   const [statusError, setStatusError] = useState<string | null>(null);
 
