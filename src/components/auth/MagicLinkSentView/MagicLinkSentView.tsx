@@ -11,7 +11,7 @@ import { MailCheck, ArrowLeft, RefreshCw } from "lucide-react";
 
 export const MagicLinkSentView = () => {
   const searchParams = useSearchParams();
-  const email = searchParams.get("email") ?? "";
+  const email = searchParams?.get("email") ?? "";
   const magicLinkMutation = useMagicLink();
   const cooldown = useCooldown(60);
 

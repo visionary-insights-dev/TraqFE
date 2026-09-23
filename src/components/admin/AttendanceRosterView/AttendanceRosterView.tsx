@@ -18,8 +18,9 @@ const STATUS_OPTIONS: Array<{ value: AttendanceStatus; label: string }> = [
 
 export const AttendanceRosterView = () => {
   const params = useParams<{ meetingId: string }>();
+  const meetingId = params?.meetingId ?? "";
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useAttendanceRoster(params.meetingId);
+  const { data, isLoading, isError, refetch } = useAttendanceRoster(meetingId);
   const saveMutation = useSaveAttendanceRoster();
 
   const [statuses, setStatuses] = useState<Record<string, AttendanceStatus>>({});

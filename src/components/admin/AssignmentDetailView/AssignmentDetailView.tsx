@@ -16,8 +16,9 @@ import { getEditWindowInfo } from "@/lib/utils/assignmentEditWindow";
 
 export const AssignmentDetailView = () => {
   const params = useParams<{ id: string }>();
+  const id = params?.id ?? "";
   const isOnline = useConnectivity();
-  const { data, isLoading, isError, refetch } = useAdminAssignment(params.id);
+  const { data, isLoading, isError, refetch } = useAdminAssignment(id);
   const publishMutation = usePublishAdminAssignment();
   const [publishError, setPublishError] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
